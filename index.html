@@ -27,7 +27,7 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            padding-bottom: 80px; /* Espacio para el botón de música flotante */
+            padding-bottom: 80px;
         }
 
         /* FONDO DE CORAZONES ANIMADOS */
@@ -475,7 +475,6 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
-        /* Menú Desplegable de Canciones */
         .music-dropdown {
             display: none;
             background: white;
@@ -524,7 +523,6 @@
             background: #fff0f3;
         }
 
-        /* Contenedor Oculto para Reproductor YouTube */
         #youtube-player {
             position: absolute;
             width: 0;
@@ -616,12 +614,12 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR MP3 PARA PIANO -->
+    <!-- REPRODUCTOR DE AUDIO PRINCIPAL -->
     <audio id="bgMusic" loop>
         <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- REPRODUCTOR INVISIBLE DE YOUTUBE PARA ARTISTAS -->
+    <!-- REPRODUCTOR INVISIBLE DE YOUTUBE PARA BAD BUNNY -->
     <div id="youtube-player"></div>
 
     <header>
@@ -698,7 +696,7 @@
         <!-- SECCIÓN INTERACTIVA PARALELA: TRIVIA Y PLANES -->
         <div class="interactive-grid">
             
-            <!-- TRIVIA (A LA IZQUIERDA) -->
+            <!-- TRIVIA -->
             <div class="quiz-box">
                 <h2>Trivia 🧠❤️</h2>
                 <div id="question-text">Cargando pregunta...</div>
@@ -707,7 +705,7 @@
                 <button class="btn-retry" id="btn-retry" onclick="resetTrivia()">Volver a intentar</button>
             </div>
 
-            <!-- ¿QUÉ HACEMOS HOY? (A LA DERECHA) -->
+            <!-- ¿QUÉ HACEMOS HOY? -->
             <div class="plan-box">
                 <h2>¿Qué hacemos hoy? 🎲</h2>
                 <div class="roulette-display" id="rouletteDisplay">
@@ -718,7 +716,7 @@
 
         </div>
 
-        <!-- MINI LIBRETA DE DIBUJO CON BORRADOR Y TAMAÑO -->
+        <!-- MINI LIBRETA DE DIBUJO -->
         <div class="libreta-box">
             <h2>Nuestra Mini Libreta 📝</h2>
             <canvas id="paintCanvas"></canvas>
@@ -1015,12 +1013,12 @@
 
 
         /* ==========================================
-           4. MÚSICA CON YOUTUBE + MP3
+           4. MÚSICA CON YOUTUBE Y MP3 DIRECTO
            ========================================== */
         const playlist = [
-            { title: "Piano Romántico", type: "mp3" },
-            { title: "Milo j - Fruto", type: "yt", ytId: "3mZ9Q4fK83A" },
-            { title: "YSY A - Cómo Chilla Ella", type: "yt", ytId: "k-Euh8GvV10" },
+            { title: "Piano Romántico", type: "mp3", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" },
+            { title: "Milo j - Fruto", type: "mp3", src: "https://cdn.soundstat.com/audio/milo-j-fruto.mp3" },
+            { title: "YSY A - Cómo Chilla Ella", type: "mp3", src: "https://cdn.soundstat.com/audio/ysy-a-como-chilla-ella.mp3" },
             { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" }
         ];
 
@@ -1029,6 +1027,7 @@
         let ytReady = false;
 
         const music = document.getElementById('bgMusic');
+        const musicSource = document.getElementById('musicSource');
         const musicIcon = document.getElementById('musicIcon');
         const musicText = document.getElementById('musicText');
         const musicDropdown = document.getElementById('musicDropdown');
@@ -1037,7 +1036,7 @@
             ytPlayer = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: '3mZ9Q4fK83A',
+                videoId: '10EX-_h4pYc',
                 playerVars: { 'autoplay': 0, 'controls': 0 },
                 events: {
                     'onReady': () => { ytReady = true; }
@@ -1047,7 +1046,7 @@
 
         function toggleMúsica() {
             const track = playlist[currentTrack];
-            
+
             if (track.type === "mp3") {
                 if (music.paused) {
                     music.play();
@@ -1081,11 +1080,12 @@
             currentTrack = index;
             const track = playlist[index];
 
-            // Detener ambos reproductores
             music.pause();
             if (ytReady) ytPlayer.stopVideo();
 
             if (track.type === "mp3") {
+                musicSource.src = track.src;
+                music.load();
                 music.play();
             } else if (track.type === "yt" && ytReady) {
                 ytPlayer.loadVideoById(track.ytId);
