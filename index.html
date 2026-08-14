@@ -27,7 +27,7 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            padding-bottom: 80px;
+            padding-bottom: 80px; /* Espacio para el botón de música flotante */
         }
 
         /* FONDO DE CORAZONES ANIMADOS */
@@ -180,7 +180,9 @@
             gap: 6px;
         }
 
-        .transition-block p { margin: 0; }
+        .transition-block p {
+            margin: 0;
+        }
 
         .down-arrow {
             font-size: 1.5em;
@@ -473,6 +475,7 @@
             background: rgba(255, 255, 255, 0.4);
         }
 
+        /* Menú Desplegable de Canciones */
         .music-dropdown {
             display: none;
             background: white;
@@ -519,6 +522,15 @@
             font-weight: bold;
             color: #ff4d6d;
             background: #fff0f3;
+        }
+
+        /* Contenedor Oculto para Reproductor YouTube */
+        #youtube-player {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Modal Galería */
@@ -586,14 +598,14 @@
     <!-- FONDO DE CORAZONES -->
     <div class="hearts-background" id="heartsBg"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA CON MENÚ -->
+    <!-- REPRODUCTOR DE MÚSICA CON MENÚ DE TRES RAYITAS -->
     <div class="music-wrapper">
         <div class="music-dropdown" id="musicDropdown">
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
             <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
-            <div class="music-item" onclick="cambiarCancion(1)">🎤 Canción Suave Cantada</div>
-            <div class="music-item" onclick="cambiarCancion(2)">💃 Canción Pop Alegre</div>
-            <div class="music-item" onclick="cambiarCancion(3)">❤️ Balada Romántica</div>
+            <div class="music-item" onclick="cambiarCancion(1)">🎧 Milo j – Fruto</div>
+            <div class="music-item" onclick="cambiarCancion(2)">🔥 YSY A – Cómo Chilla Ella</div>
+            <div class="music-item" onclick="cambiarCancion(3)">🐰 Bad Bunny – Ojitos Lindos</div>
         </div>
 
         <div class="music-btn-container">
@@ -604,10 +616,13 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR DE AUDIO -->
+    <!-- REPRODUCTOR MP3 PARA PIANO -->
     <audio id="bgMusic" loop>
-        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- REPRODUCTOR INVISIBLE DE YOUTUBE PARA ARTISTAS -->
+    <div id="youtube-player"></div>
 
     <header>
         <h1>Nuestra Historia ❤️</h1>
@@ -683,7 +698,7 @@
         <!-- SECCIÓN INTERACTIVA PARALELA: TRIVIA Y PLANES -->
         <div class="interactive-grid">
             
-            <!-- TRIVIA -->
+            <!-- TRIVIA (A LA IZQUIERDA) -->
             <div class="quiz-box">
                 <h2>Trivia 🧠❤️</h2>
                 <div id="question-text">Cargando pregunta...</div>
@@ -692,7 +707,7 @@
                 <button class="btn-retry" id="btn-retry" onclick="resetTrivia()">Volver a intentar</button>
             </div>
 
-            <!-- ¿QUÉ HACEMOS HOY? -->
+            <!-- ¿QUÉ HACEMOS HOY? (A LA DERECHA) -->
             <div class="plan-box">
                 <h2>¿Qué hacemos hoy? 🎲</h2>
                 <div class="roulette-display" id="rouletteDisplay">
@@ -703,7 +718,7 @@
 
         </div>
 
-        <!-- MINI LIBRETA DE DIBUJO -->
+        <!-- MINI LIBRETA DE DIBUJO CON BORRADOR Y TAMAÑO -->
         <div class="libreta-box">
             <h2>Nuestra Mini Libreta 📝</h2>
             <canvas id="paintCanvas"></canvas>
@@ -735,6 +750,9 @@
             <p id="modalCaption"></p>
         </div>
     </div>
+
+    <!-- SCRIPT API YOUTUBE -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
         /* ==========================================
@@ -997,35 +1015,60 @@
 
 
         /* ==========================================
-           4. REPRODUCTOR DE MÚSICA CON ENLACES
+           4. MÚSICA CON YOUTUBE + MP3
            ========================================== */
         const playlist = [
-            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" },
-            { title: "Canción Suave Cantada", src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3" },
-            { title: "Canción Pop Alegre", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73223.mp3" },
-            { title: "Balada Romántica", src: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92db1.mp3" }
+            { title: "Piano Romántico", type: "mp3" },
+            { title: "Milo j - Fruto", type: "yt", ytId: "3mZ9Q4fK83A" },
+            { title: "YSY A - Cómo Chilla Ella", type: "yt", ytId: "k-Euh8GvV10" },
+            { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" }
         ];
 
         let currentTrack = 0;
+        let ytPlayer = null;
+        let ytReady = false;
 
         const music = document.getElementById('bgMusic');
-        const musicSource = document.getElementById('musicSource');
         const musicIcon = document.getElementById('musicIcon');
         const musicText = document.getElementById('musicText');
         const musicDropdown = document.getElementById('musicDropdown');
 
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: '3mZ9Q4fK83A',
+                playerVars: { 'autoplay': 0, 'controls': 0 },
+                events: {
+                    'onReady': () => { ytReady = true; }
+                }
+            });
+        }
+
         function toggleMúsica() {
-            if (music.paused) {
-                music.play().then(() => {
+            const track = playlist[currentTrack];
+            
+            if (track.type === "mp3") {
+                if (music.paused) {
+                    music.play();
                     musicIcon.innerText = '⏸️';
                     musicText.innerText = 'Pausar';
-                }).catch(err => {
-                    console.log("Se requiere interacción para reproducir el audio.", err);
-                });
-            } else {
-                music.pause();
-                musicIcon.innerText = '🎵';
-                musicText.innerText = 'Música';
+                } else {
+                    music.pause();
+                    musicIcon.innerText = '🎵';
+                    musicText.innerText = 'Música';
+                }
+            } else if (track.type === "yt" && ytReady) {
+                const state = ytPlayer.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) {
+                    ytPlayer.pauseVideo();
+                    musicIcon.innerText = '🎵';
+                    musicText.innerText = 'Música';
+                } else {
+                    ytPlayer.playVideo();
+                    musicIcon.innerText = '⏸️';
+                    musicText.innerText = 'Pausar';
+                }
             }
         }
 
@@ -1038,16 +1081,19 @@
             currentTrack = index;
             const track = playlist[index];
 
+            // Detener ambos reproductores
             music.pause();
-            musicSource.src = track.src;
-            music.load();
-            
-            music.play().then(() => {
-                musicIcon.innerText = '⏸️';
-                musicText.innerText = 'Pausar';
-            }).catch(err => {
-                console.log("Error al reproducir audio:", err);
-            });
+            if (ytReady) ytPlayer.stopVideo();
+
+            if (track.type === "mp3") {
+                music.play();
+            } else if (track.type === "yt" && ytReady) {
+                ytPlayer.loadVideoById(track.ytId);
+                ytPlayer.playVideo();
+            }
+
+            musicIcon.innerText = '⏸️';
+            musicText.innerText = 'Pausar';
 
             const items = document.querySelectorAll('.music-item');
             items.forEach((item, idx) => {
