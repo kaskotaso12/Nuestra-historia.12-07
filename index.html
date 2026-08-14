@@ -180,9 +180,7 @@
             gap: 6px;
         }
 
-        .transition-block p {
-            margin: 0;
-        }
+        .transition-block p { margin: 0; }
 
         .down-arrow {
             font-size: 1.5em;
@@ -593,9 +591,9 @@
         <div class="music-dropdown" id="musicDropdown">
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
             <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
-            <div class="music-item" onclick="cambiarCancion(1)">🎧 Milo j – Fruto</div>
-            <div class="music-item" onclick="cambiarCancion(2)">🔥 YSY A – Cómo Chilla Ella</div>
-            <div class="music-item" onclick="cambiarCancion(3)">🐰 Bad Bunny – Ojitos Lindos</div>
+            <div class="music-item" onclick="cambiarCancion(1)">🎤 Canción Suave Cantada</div>
+            <div class="music-item" onclick="cambiarCancion(2)">💃 Canción Pop Alegre</div>
+            <div class="music-item" onclick="cambiarCancion(3)">❤️ Balada Romántica</div>
         </div>
 
         <div class="music-btn-container">
@@ -606,9 +604,9 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR DE AUDIO CON CADA ARCHIVO LOCAL -->
+    <!-- REPRODUCTOR DE AUDIO -->
     <audio id="bgMusic" loop>
-        <source id="musicSource" src="piano.mp3" type="audio/mpeg">
+        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
     </audio>
 
     <header>
@@ -999,13 +997,13 @@
 
 
         /* ==========================================
-           4. REPRODUCTOR DE MÚSICA LOCAL
+           4. REPRODUCTOR DE MÚSICA CON ENLACES
            ========================================== */
         const playlist = [
-            { title: "Piano Romántico", src: "piano.mp3" },
-            { title: "Milo j - Fruto", src: "fruto.mp3" },
-            { title: "YSY A - Cómo Chilla Ella", src: "como-chilla-ella.mp3" },
-            { title: "Bad Bunny - Ojitos Lindos", src: "ojitos-lindos.mp3" }
+            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" },
+            { title: "Canción Suave Cantada", src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3" },
+            { title: "Canción Pop Alegre", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73223.mp3" },
+            { title: "Balada Romántica", src: "https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92db1.mp3" }
         ];
 
         let currentTrack = 0;
