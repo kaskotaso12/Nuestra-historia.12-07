@@ -603,9 +603,7 @@
         <div class="music-dropdown" id="musicDropdown">
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
             <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
-            <div class="music-item" onclick="cambiarCancion(1)">🎧 Milo j – Fruto</div>
-            <div class="music-item" onclick="cambiarCancion(2)">🔥 YSY A – Cómo Chilla Ella</div>
-            <div class="music-item" onclick="cambiarCancion(3)">🐰 Bad Bunny – Ojitos Lindos</div>
+            <div class="music-item" onclick="cambiarCancion(1)">🐰 Bad Bunny – Ojitos Lindos</div>
         </div>
 
         <div class="music-btn-container">
@@ -1019,8 +1017,6 @@
            ========================================== */
         const playlist = [
             { title: "Piano Romántico", type: "mp3" },
-            { title: "Milo j - Fruto", type: "yt", ytId: "3mZ9Q4fK83A" },
-            { title: "YSY A - Cómo Chilla Ella", type: "yt", ytId: "k-Euh8GvV10" },
             { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" }
         ];
 
@@ -1037,7 +1033,7 @@
             ytPlayer = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: '3mZ9Q4fK83A',
+                videoId: '10EX-_h4pYc',
                 playerVars: { 'autoplay': 0, 'controls': 0 },
                 events: {
                     'onReady': () => { ytReady = true; }
