@@ -604,6 +604,7 @@
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
             <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
             <div class="music-item" onclick="cambiarCancion(1)">🐰 Bad Bunny – Ojitos Lindos</div>
+            <div class="music-item" onclick="cambiarCancion(2)">🎸 Babasónicos – Puesto</div>
         </div>
 
         <div class="music-btn-container">
@@ -1015,9 +1016,12 @@
         /* ==========================================
            4. MÚSICA CON YOUTUBE + MP3
            ========================================== */
+        // Reemplaza los códigos en 'ytId' por las IDs de tus videos de YouTube preferidos.
+        // Ejemplo de ID: Si el enlace es https://www.youtube.com/watch?v=zNCJokWdIpE, el ytId es "zNCJokWdIpE"
         const playlist = [
             { title: "Piano Romántico", type: "mp3" },
-            { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" }
+            { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" },
+            { title: "Babasónicos - Puesto", type: "yt", ytId: "https://www.youtube.com/watch?v=5zSBOSRFCGc&list=RD5zSBOSRFCGc&start_radio=1" }
         ];
 
         let currentTrack = 0;
@@ -1029,11 +1033,22 @@
         const musicText = document.getElementById('musicText');
         const musicDropdown = document.getElementById('musicDropdown');
 
+        function extraerYtId(urlOId) {
+            if (!urlOId) return "";
+            if (urlOId.includes("v=")) {
+                return urlOId.split("v=")[1].split("&")[0];
+            } else if (urlOId.includes("youtu.be/")) {
+                return urlOId.split("youtu.be/")[1].split("?")[0];
+            }
+            return urlOId;
+        }
+
         function onYouTubeIframeAPIReady() {
+            const primerYtId = extraerYtId(playlist[1].ytId);
             ytPlayer = new YT.Player('youtube-player', {
                 height: '0',
                 width: '0',
-                videoId: '10EX-_h4pYc',
+                videoId: primerYtId,
                 playerVars: { 'autoplay': 0, 'controls': 0 },
                 events: {
                     'onReady': () => { ytReady = true; }
@@ -1084,7 +1099,8 @@
             if (track.type === "mp3") {
                 music.play();
             } else if (track.type === "yt" && ytReady) {
-                ytPlayer.loadVideoById(track.ytId);
+                const videoId = extraerYtId(track.ytId);
+                ytPlayer.loadVideoById(videoId);
                 ytPlayer.playVideo();
             }
 
