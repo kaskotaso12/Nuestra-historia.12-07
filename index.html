@@ -1,513 +1,942 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nuestro Aniversario</title>
-  <style>
-    /* Reset y Estilos Generales */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- EVITA QUE GOOGLE INDEXE LA PÁGINA EN BUSCADORES -->
+    <meta name="robots" content="noindex, nofollow">
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7ede2;
-      color: #333;
-      padding: 20px 20px 100px 20px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
+    <title>Nuestra Historia ❤️</title>
 
-    h1 {
-      color: #84a59d;
-      margin-top: 10px;
-      margin-bottom: 25px;
-      text-align: center;
-    }
+    <!-- Librería para el confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    /* ==========================================
-       SECCIÓN FOTOS / COLLAGE POLAROID
-       ========================================== */
-    .collage-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 25px;
-      max-width: 1000px;
-      margin-bottom: 40px;
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fff0f3 0%, #ffccd5 100%);
+            color: #4a4a4a;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    .polaroid {
-      background-color: #ffffff;
-      padding: 12px 12px 25px 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-      border-radius: 4px;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      width: 220px;
-    }
+        /* FONDO DE CORAZONES ANIMADOS */
+        .hearts-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
 
-    /* Leves rotaciones para dar efecto collage casual */
-    .polaroid:nth-child(1) { transform: rotate(-3deg); }
-    .polaroid:nth-child(2) { transform: rotate(2deg); }
-    .polaroid:nth-child(3) { transform: rotate(-1deg); }
+        .heart {
+            position: absolute;
+            bottom: -50px;
+            color: rgba(255, 117, 140, 0.35);
+            font-size: 20px;
+            animation: floatUp 8s linear infinite;
+        }
 
-    .polaroid:hover {
-      transform: scale(1.05) rotate(0deg);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-      z-index: 10;
-    }
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
 
-    .polaroid img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 2px;
-    }
+        header {
+            background-color: rgba(255, 182, 193, 0.85);
+            backdrop-filter: blur(5px);
+            padding: 30px 20px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+            position: relative;
+            z-index: 1;
+        }
 
-    .polaroid .caption {
-      margin-top: 12px;
-      font-family: 'Comic Sans MS', 'Caveat', cursive, sans-serif;
-      font-size: 16px;
-      color: #555;
-    }
+        h1 { margin: 0; font-size: 2.5em; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+        p { font-size: 1.1em; }
 
-    /* ==========================================
-       SECCIÓN TRIVIA
-       ========================================== */
-    .trivia-container {
-      background-color: #ffffff;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 450px;
-      text-align: center;
-      margin-bottom: 40px;
-    }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
 
-    .options-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 15px;
-    }
+        /* Banner de Cumple Mes / Aniversario */
+        .anniversary-banner {
+            display: none;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 20px rgba(255, 117, 140, 0.4);
+            animation: pulse 2s infinite;
+        }
 
-    .btn-option {
-      background-color: #f28482;
-      color: white;
-      border: none;
-      padding: 12px 15px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
-    }
+        .anniversary-banner h2 { margin: 0 0 10px 0; font-size: 2em; }
+        .anniversary-banner p { margin: 0; font-size: 1.2em; font-weight: 500; }
 
-    .btn-option:hover {
-      background-color: #f5cab3;
-      color: #333;
-      transform: translateY(-2px);
-    }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
 
-    .feedback {
-      margin-top: 15px;
-      font-weight: bold;
-      font-size: 18px;
-      min-height: 25px;
-    }
+        /* Bloque del Contador */
+        .counter-box {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
 
-    .btn-retry {
-      display: none;
-      margin: 15px auto 0 auto;
-      background-color: #84a59d;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        #timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e63946;
+        }
 
-    .btn-retry:hover {
-      background-color: #62837b;
-    }
+        /* SECCIÓN RULETA DE CITAS */
+        .roulette-box {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
 
-    /* ==========================================
-       SECCIÓN LIBRETA (Abajo a la izquierda)
-       ========================================== */
-    #libreta-container {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1000;
-      background-color: #f7f1e3;
-      padding: 12px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      border: 2px solid #f5cab3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+        .roulette-box h2 { margin-top: 0; color: #d62828; font-size: 1.8em; }
 
-    .libreta-header {
-      font-size: 14px;
-      font-weight: bold;
-      color: #84a59d;
-      margin-bottom: 8px;
-    }
+        .roulette-display {
+            background: #fff0f3;
+            border: 2px dashed #ff758c;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px auto;
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #ff2a55;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    #canvas-libreta {
-      background-color: #ffffff;
-      border: 1px dashed #cccccc;
-      border-radius: 6px;
-      cursor: crosshair;
-      touch-action: none;
-    }
+        .spin-btn {
+            background: linear-gradient(135deg, #ff4d6d 0%, #ff758c 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 28px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
-    .btn-clear {
-      margin-top: 8px;
-      background-color: #f28482;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      cursor: pointer;
-    }
+        .spin-btn:hover { transform: scale(1.05); }
 
-    .btn-clear:hover {
-      background-color: #d86967;
-    }
+        /* SECCIÓN TRIVIA */
+        .quiz-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+            text-align: left;
+        }
 
-    /* ==========================================
-       SECCIÓN ¿QUÉ HACEMOS HOY? (Ícono flotante a la derecha)
-       ========================================== */
-    #plan-icon-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background-color: #f28482;
-      color: white;
-      border: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      cursor: pointer;
-      font-size: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
+        .quiz-box h2 {
+            margin-top: 0;
+            color: #d62828;
+            font-size: 1.8em;
+            text-align: center;
+        }
 
-    #plan-icon-btn:hover {
-      transform: scale(1.1);
-      background-color: #e56b69;
-    }
+        .quiz-item {
+            margin-bottom: 20px;
+            background: #fff0f3;
+            padding: 15px;
+            border-radius: 12px;
+        }
 
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-    }
+        .quiz-item p {
+            font-weight: bold;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
 
-    .modal-content {
-      background-color: #ffffff;
-      padding: 25px;
-      border-radius: 12px;
-      max-width: 350px;
-      width: 90%;
-      text-align: center;
-      position: relative;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
 
-    .close-modal {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 22px;
-      cursor: pointer;
-      color: #888;
-    }
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
 
-    .close-modal:hover {
-      color: #333;
-    }
+        .quiz-btn {
+            background: white;
+            border: 2px solid #ffccd5;
+            color: #444;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: left;
+        }
 
-    .plan-result {
-      font-size: 20px;
-      font-weight: bold;
-      color: #84a59d;
-      margin: 20px 0;
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        .quiz-btn:hover {
+            border-color: #ff758c;
+            background: #ffe6ea;
+        }
 
-    .btn-spin {
-      background-color: #84a59d;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        .quiz-btn.correct {
+            background: #2ec4b6 !important;
+            color: white !important;
+            border-color: #2ec4b6 !important;
+        }
 
-    .btn-spin:hover {
-      background-color: #62837b;
-    }
-  </style>
+        .quiz-btn.incorrect {
+            background: #e63946 !important;
+            color: white !important;
+            border-color: #e63946 !important;
+        }
+
+        #quizResult {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d62828;
+            margin-top: 15px;
+        }
+
+        /* SECCIÓN MINI LIBRETA DE DIBUJO */
+        .drawing-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 40px;
+        }
+
+        .drawing-box h2 {
+            margin-top: 0;
+            color: #d62828;
+            font-size: 1.8em;
+        }
+
+        .canvas-container {
+            position: relative;
+            margin: 15px auto;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        canvas {
+            background: #ffffff;
+            border: 2px dashed #ff758c;
+            border-radius: 12px;
+            cursor: crosshair;
+            touch-action: none; /* Evita desplazar la pantalla al dibujar en celular */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+            width: 100%;
+            height: 300px;
+            display: block;
+        }
+
+        .drawing-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .drawing-btn {
+            background: white;
+            border: 2px solid #ffccd5;
+            color: #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .drawing-btn:hover {
+            border-color: #ff4d6d;
+            background: #ffe6ea;
+        }
+
+        .drawing-btn.active {
+            background: #ff4d6d;
+            color: white;
+            border-color: #ff4d6d;
+        }
+
+        .color-picker {
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+
+        h2.section-title {
+            font-size: 2em;
+            color: #d62828;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 0px white;
+        }
+
+        /* GALERÍA ESTILO COLLAGE / POLAROID */
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 12px 12px 18px 12px;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            width: 260px;
+            position: relative;
+        }
+
+        .card:nth-child(odd) { transform: rotate(-2deg); }
+        .card:nth-child(even) { transform: rotate(2deg); }
+        .card:nth-child(3n) { transform: rotate(-3.5deg); }
+        .card:nth-child(5n) { transform: rotate(3deg); }
+
+        .card:hover {
+            transform: scale(1.08) rotate(0deg) !important;
+            box-shadow: 0 15px 30px rgba(230, 57, 70, 0.25);
+            z-index: 10;
+        }
+
+        .card img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .card p {
+            margin: 12px 0 0 0;
+            font-size: 1em;
+            color: #444;
+            font-weight: 600;
+        }
+
+        .coming-soon {
+            margin-top: 50px;
+            margin-bottom: 30px;
+            font-size: 1.3em;
+            color: #888;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        /* BOTÓN FLOTANTE DE MÚSICA */
+        .music-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(255, 77, 109, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 999;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.08);
+            background: #ff2a55;
+        }
+
+        .music-btn.playing {
+            animation: pulse-music 1.5s infinite;
+        }
+
+        @keyframes pulse-music {
+            0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 77, 109, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+        }
+
+        /* Modal para ver la foto en grande */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+
+        .modal-content p {
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .close-btn:hover { color: #000; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
 <body>
 
-  <h1>Nuestros Momentos Especiales ❤️</h1>
+    <!-- FONDO DE CORAZONES -->
+    <div class="hearts-background" id="heartsBg"></div>
 
-  <!-- Galería de Fotos (Collage Polaroid) -->
-  <div class="collage-container">
-    <div class="polaroid">
-      <img src="foto1.jpg" alt="Foto 1">
-      <div class="caption">Nuestra primera foto 📸</div>
+    <!-- BOTÓN DE MÚSICA -->
+    <button class="music-btn" id="musicBtn" onclick="toggleMúsica()">
+        <span id="musicIcon">🎵</span> <span id="musicText">Música</span>
+    </button>
+
+    <!-- AUDIO DE FONDO -->
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
+    </audio>
+
+    <header>
+        <h1>Nuestra Historia ❤️</h1>
+        <p>Un pequeño rincón en internet para nosotros.</p>
+    </header>
+
+    <div class="container">
+
+        <!-- BANNER DÍA 12 (CUMPLE MES / AÑO) -->
+        <div id="anniversaryBanner" class="anniversary-banner">
+            <h2>🎉 ¡Feliz Día Gorda! ❤️</h2>
+            <p id="anniversaryText">Hoy cumplimos 1 mes juntos!</p>
+        </div>
+
+        <!-- CONTADOR DE TIEMPO -->
+        <div class="counter-box">
+            <h2>Juntos desde hace:</h2>
+            <div id="timer">Cargando contador...</div>
+        </div>
+
+        <!-- RULETA DE CITAS -->
+        <div class="roulette-box">
+            <h2>¿Qué hacemos hoy? 🎲</h2>
+            <p style="text-align: center;">Tocá el botón para elegir nuestra próxima cita al azar:</p>
+            <div class="roulette-display" id="rouletteDisplay">
+                Haz clic abajo para elegir 👇
+            </div>
+            <div style="text-align: center;">
+                <button class="spin-btn" onclick="girarRuleta()">Girar Ruleta 🎰</button>
+            </div>
+        </div>
+
+        <!-- TRIVIA: ¿QUÉ TANTO NOS CONOCEMOS? -->
+        <div class="quiz-box">
+            <h2>Trivia: ¿Qué tanto sabés de nosotros? 🧠❤️</h2>
+            
+            <div class="quiz-item">
+                <p>1. ¿Dónde fue uno de nuestros lugares más especiales compartiendo una gran pasión?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 1, true)">Cancha de Independiente 🔴</button>
+                    <button class="quiz-btn" onclick="responder(this, 1, false)">Cine 🍿</button>
+                    <button class="quiz-btn" onclick="responder(this, 1, false)">En un shopping 🛍️</button>
+                    <button class="quiz-btn" onclick="responder(this, 1, false)">Un recital de rock 🎸</button>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. ¿Cuál es nuestra bebida infalible para salir a tomar en un día copado?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 2, false)">Café helado ☕</button>
+                    <button class="quiz-btn" onclick="responder(this, 2, true)">Tereré bien frío 🧉</button>
+                    <button class="quiz-btn" onclick="responder(this, 2, false)">Gaseosa 🥤</button>
+                    <button class="quiz-btn" onclick="responder(this, 2, false)">Jugo de naranja 🍊</button>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. ¿Qué comida es la preferida para pedir y mirar una peli juntos?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 3, false)">Sushi 🍣</button>
+                    <button class="quiz-btn" onclick="responder(this, 3, false)">Empanadas 🥟</button>
+                    <button class="quiz-btn" onclick="responder(this, 3, true)">Hamburguesas de Tasty o McD 🍔</button>
+                    <button class="quiz-btn" onclick="responder(this, 3, false)">Ensalada 🥗</button>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>4. ¿Quién es la persona más hermosa, tierna y dueña de mi corazón?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 4, false)">Una actriz famosa 🎬</button>
+                    <button class="quiz-btn" onclick="responder(this, 4, true)">Vos (mi gorda hermosa) 🥰</button>
+                    <button class="quiz-btn" onclick="responder(this, 4, false)">Nadie 😜</button>
+                    <button class="quiz-btn" onclick="responder(this, 4, false)">Messi 🐐</button>
+                </div>
+            </div>
+
+            <div id="quizResult"></div>
+        </div>
+
+        <!-- SECCIÓN MINI LIBRETA / PIZARRA DE DIBUJO -->
+        <div class="drawing-box">
+            <h2>Nuestra Mini Libreta 📝✏️</h2>
+            <p>¡Dejame un dibujito o un mensaje a mano! Se guarda automáticamente:</p>
+            
+            <div class="canvas-container">
+                <canvas id="paintCanvas"></canvas>
+            </div>
+
+            <div class="drawing-controls">
+                <input type="color" id="colorPicker" class="color-picker" value="#ff2a55">
+                <button class="drawing-btn active" id="pencilBtn" onclick="usarLapiz()">✏️ Lápiz</button>
+                <button class="drawing-btn" id="eraserBtn" onclick="usarGoma()">🧹 Borrador</button>
+                <button class="drawing-btn" onclick="limpiarCanvas()">🗑️ Limpiar Todo</button>
+            </div>
+        </div>
+
+        <!-- GALERÍA DE FOTOS -->
+        <h2 class="section-title">Nuestros Recuerdos 📸</h2>
+        <div class="gallery">
+            <div class="card" onclick="abrirModal('20251219_142435.jpg', 'Ese dia supe que encontre el amor de mi vida')">
+                <img src="20251219_142435.jpg" alt="Primera propuesta">
+                <p>Primera propuesta 🎈❤️</p>
+            </div>
+            <div class="card" onclick="abrirModal('IMG-20260716-WA0005.jpg', 'Al fin pude pasar el mundial con alguien especial')">
+                <img src="IMG-20260716-WA0005.jpg" alt="Mundial 2026">
+                <p>Mundial 2026 🇦🇷⚽</p>
+            </div>
+            <div class="card" onclick="abrirModal('20251207_222122.jpg', 'Nunca voy a olvidar ese dia de tu cumpleaños')">
+                <img src="20251207_222122.jpg" alt="Cumpleaños de mi gordita">
+                <p>Cumpleaños de mi gordita 🎂✨</p>
+            </div>
+            <div class="card" onclick="abrirModal('20251226_220232.jpg', 'Te veias hermosa y te saque foto')">
+                <img src="20251226_220232.jpg" alt="Noche especial">
+                <p>Noche especial 🌊🌙</p>
+            </div>
+            <div class="card" onclick="abrirModal('20251225_211756.jpg', 'Cada dia que venis a casa me alegras el dia')">
+                <img src="20251225_211756.jpg" alt="Momentos unicos">
+                <p>Momentos únicos 💋🏡</p>
+            </div>
+            <div class="card" onclick="abrirModal('20260805_232756.jpg', 'Todo es una experiencia con vos')">
+                <img src="20260805_232756.jpg" alt="Locuras con vos">
+                <p>Locuras con vos 🤪❤️</p>
+            </div>
+            <div class="card" onclick="abrirModal('IMG-20251205-WA0170.jpg', 'Estuviste en mi ultimo dia de colegio y por eso te amo mucho mas')">
+                <img src="IMG-20251205-WA0170.jpg" alt="Egresado con mi gorda">
+                <p>Egresado con mi gorda 🎓🌿</p>
+            </div>
+            <div class="card" onclick="abrirModal('20260809_141711.jpg', 'Me encanta compartir mi espacio personal con vos')">
+                <img src="20260809_141711.jpg" alt="Siempre cerca">
+                <p>Siempre cerca 🥰💖</p>
+            </div>
+            <div class="card" onclick="abrirModal('20260807_233745.jpg', 'Siempre va a ser un regalo tuyo dejarme ir a tu casa a verte')">
+                <img src="20260807_233745.jpg" alt="No importa el horario">
+                <p>No importa el horario 🚗🌙</p>
+            </div>
+            <div class="card" onclick="abrirModal('Captura de pantalla 2026-08-11 170426.png', 'Ese dia me senti una persona tan querida, que supe que estaba en el lugar correcto')">
+                <img src="Captura de pantalla 2026-08-11 170426.png" alt="Cancha de independiente">
+                <p>Cancha de Independiente 🔴⚽</p>
+            </div>
+        </div>
+
+        <p class="coming-soon">Más recuerdos próximamente... ✨</p>
+
     </div>
-    <div class="polaroid">
-      <img src="foto2.jpg" alt="Foto 2">
-      <div class="caption">Un día inolvidable ✨</div>
+
+    <!-- MODAL FOTO EN GRANDE -->
+    <div id="imageModal" class="modal" onclick="cerrarModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+            <img id="modalImg" src="" alt="Foto ampliada">
+            <p id="modalCaption"></p>
+        </div>
     </div>
-    <div class="polaroid">
-      <img src="foto3.jpg" alt="Foto 3">
-      <div class="caption">Juntos siempre 💕</div>
-    </div>
-  </div>
 
-  <!-- Contenedor de la Trivia -->
-  <div class="trivia-container">
-    <h2>Trivia Interactiva 🧩</h2>
-    <br>
-    <div id="question-text" style="font-weight: 600; font-size: 18px;">Cargando pregunta...</div>
-    <div class="options-container" id="options-container"></div>
-    <div class="feedback" id="feedback"></div>
-    <button class="btn-retry" id="btn-retry" onclick="resetTrivia()">Volver a intentar</button>
-  </div>
+    <script>
+        // LÓGICA DE DIBUJO Y LIBRETA (CANVAS + LOCALSTORAGE)
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const pencilBtn = document.getElementById('pencilBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
 
-  <!-- Libreta abajo a la izquierda (Desplegada completa) -->
-  <div id="libreta-container">
-    <div class="libreta-header">Mi Libreta 📝</div>
-    <canvas id="canvas-libreta" width="220" height="260"></canvas>
-    <button class="btn-clear" onclick="limpiarCanvas()">Borrar dibujo</button>
-  </div>
+        let dibujando = false;
+        let modoBorrador = false;
 
-  <!-- Botón de Ícono flotante a la derecha para "¿Qué hacemos hoy?" -->
-  <button id="plan-icon-btn" onclick="openPlanModal()" title="¿Qué hacemos hoy?">💡</button>
+        function ajustarTamanoCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            // Guarda contenido actual para no perderlo al redimensionar
+            const tempImage = canvas.toDataURL();
+            
+            canvas.width = rect.width;
+            canvas.height = 300;
 
-  <!-- Ventana Modal Emergente para "¿Qué hacemos hoy?" -->
-  <div class="modal-overlay" id="plan-modal">
-    <div class="modal-content">
-      <span class="close-modal" onclick="closePlanModal()">&times;</span>
-      <h2>¿Qué hacemos hoy? 🤔</h2>
-      <div class="plan-result" id="plan-result">¡Presiona el botón para elegir un plan!</div>
-      <button class="btn-spin" onclick="generatePlan()">Elegir Plan</button>
-    </div>
-  </div>
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = modoBorrador ? 20 : 4;
+            ctx.strokeStyle = modoBorrador ? '#ffffff' : colorPicker.value;
 
-  <script>
-    /* ==========================================
-       1. LÓGICA DE LA TRIVIA
-       ========================================== */
-    const questions = [
-      {
-        question: "¿Dónde fue nuestra primera cita?",
-        options: ["El parque", "El cine", "Un café", "En la playa"],
-        correct: 2
-      },
-      {
-        question: "¿Cuál es mi comida favorita?",
-        options: ["Pizza", "Hamburguesa", "Milanesas", "Sushi"],
-        correct: 0
-      },
-      {
-        question: "¿Cuál es nuestra canción especial?",
-        options: ["Canción A", "Canción B", "Canción C", "Canción D"],
-        correct: 1
-      }
-    ];
+            // Restaura contenido guardado
+            cargarDibujoGuardado(tempImage);
+        }
 
-    let currentQuestionIndex = 0;
+        function obtenerPosicion(e) {
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+            if (e.touches && e.touches.length > 0) {
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
+            } else {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+            return { x, y };
+        }
 
-    function loadQuestion() {
-      const q = questions[currentQuestionIndex];
-      document.getElementById("question-text").innerText = `${currentQuestionIndex + 1}. ${q.question}`;
-      
-      const optionsContainer = document.getElementById("options-container");
-      optionsContainer.innerHTML = "";
-      document.getElementById("feedback").innerText = "";
-      document.getElementById("btn-retry").style.display = "none";
+        function empezarDibujo(e) {
+            dibujando = true;
+            const pos = obtenerPosicion(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
 
-      q.options.forEach((opt, index) => {
-        const btn = document.createElement("button");
-        btn.className = "btn-option";
-        btn.innerText = opt;
-        btn.onclick = () => checkAnswer(index);
-        optionsContainer.appendChild(btn);
-      });
-    }
+        function dibujar(e) {
+            if (!dibujando) return;
+            e.preventDefault();
+            const pos = obtenerPosicion(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
 
-    function checkAnswer(selectedIndex) {
-      const q = questions[currentQuestionIndex];
-      const feedback = document.getElementById("feedback");
+        function detenerDibujo() {
+            if (dibujando) {
+                dibujando = false;
+                ctx.closePath();
+                guardarDibujo();
+            }
+        }
 
-      if (selectedIndex === q.correct) {
-        feedback.style.color = "#4ba375";
-        feedback.innerText = "¡Correcto! ❤️";
-        disableOptions();
+        function usarLapiz() {
+            modoBorrador = false;
+            ctx.strokeStyle = colorPicker.value;
+            ctx.lineWidth = 4;
+            pencilBtn.classList.add('active');
+            eraserBtn.classList.remove('active');
+        }
 
-        setTimeout(() => {
-          currentQuestionIndex++;
-          if (currentQuestionIndex < questions.length) {
-            loadQuestion();
-          } else {
-            document.getElementById("question-text").innerText = "¡Completaste la trivia! 🎉";
-            document.getElementById("options-container").innerHTML = "";
-            feedback.innerText = "¡Sos lo mejor!";
-          }
-        }, 1200);
-      } else {
-        feedback.style.color = "#d86967";
-        feedback.innerText = "¡Ups! Te equivocaste... 😅";
-        disableOptions();
-        document.getElementById("btn-retry").style.display = "block";
-      }
-    }
+        function usarGoma() {
+            modoBorrador = true;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 20;
+            eraserBtn.classList.add('active');
+            pencilBtn.classList.remove('active');
+        }
 
-    function disableOptions() {
-      const buttons = document.querySelectorAll(".btn-option");
-      buttons.forEach(btn => btn.disabled = true);
-    }
+        function limpiarCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            localStorage.removeItem('dibujoNuestraHistoria');
+        }
 
-    function resetTrivia() {
-      currentQuestionIndex = 0;
-      loadQuestion();
-    }
+        function guardarDibujo() {
+            const dataURL = canvas.toDataURL();
+            localStorage.setItem('dibujoNuestraHistoria', dataURL);
+        }
 
-    loadQuestion();
+        function cargarDibujoGuardado(dataURLOpcional) {
+            const dataURL = dataURLOpcional || localStorage.getItem('dibujoNuestraHistoria');
+            if (dataURL) {
+                const img = new Image();
+                img.src = dataURL;
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                };
+            }
+        }
 
+        // Eventos Mouse y Touch
+        canvas.addEventListener('mousedown', empezarDibujo);
+        canvas.addEventListener('mousemove', dibujar);
+        canvas.addEventListener('mouseup', detenerDibujo);
+        canvas.addEventListener('mouseleave', detenerDibujo);
 
-    /* ==========================================
-       2. LÓGICA DEL ÍCONO / MODAL "¿QUÉ HACEMOS HOY?"
-       ========================================== */
-    const plans = [
-      "Tomar tereré en el parque 🧉",
-      "Paseo o caminata nocturna 🌙",
-      "Ir a comer hamburguesas 🍔",
-      "Maratón de películas y pelis 🎬",
-      "Probar un café nuevo ☕"
-    ];
+        canvas.addEventListener('touchstart', empezarDibujo, { passive: false });
+        canvas.addEventListener('touchmove', dibujar, { passive: false });
+        canvas.addEventListener('touchend', detenerDibujo);
 
-    function openPlanModal() {
-      document.getElementById("plan-modal").style.display = "flex";
-    }
+        colorPicker.addEventListener('input', (e) => {
+            if (!modoBorrador) {
+                ctx.strokeStyle = e.target.value;
+            }
+        });
 
-    function closePlanModal() {
-      document.getElementById("plan-modal").style.display = "none";
-    }
+        // Inicializar canvas al cargar
+        window.addEventListener('load', () => {
+            ajustarTamanoCanvas();
+            cargarDibujoGuardado();
+        });
 
-    function generatePlan() {
-      const resultDiv = document.getElementById("plan-result");
-      resultDiv.innerText = "Pensando...";
-      setTimeout(() => {
-        const randomPlan = plans[Math.floor(Math.random() * plans.length)];
-        resultDiv.innerText = randomPlan;
-      }, 400);
-    }
+        // LÓGICA DE TRIVIA
+        let aciertos = 0;
+        let respondidas = [false, false, false, false];
 
+        function responder(boton, numPregunta, esCorrecta) {
+            if (respondidas[numPregunta - 1]) return;
 
-    /* ==========================================
-       3. LÓGICA DE LA LIBRETA (CANVAS + LOCALSTORAGE)
-       ========================================== */
-    const canvas = document.getElementById('canvas-libreta');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
+            const opciones = boton.parentElement.querySelectorAll('.quiz-btn');
+            
+            if (esCorrecta) {
+                boton.classList.add('correct');
+                aciertos++;
+            } else {
+                boton.classList.add('incorrect');
+            }
 
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = '#333333';
+            opciones.forEach(btn => btn.style.pointerEvents = 'none');
+            respondidas[numPregunta - 1] = true;
 
-    // Cargar dibujo guardado en localStorage
-    const savedDrawing = localStorage.getItem('libreta_dibujo');
-    if (savedDrawing) {
-      const img = new Image();
-      img.onload = () => ctx.drawImage(img, 0, 0);
-      img.src = savedDrawing;
-    }
+            if (!respondidas.includes(false)) {
+                const resultado = document.getElementById('quizResult');
+                if (aciertos === 4) {
+                    resultado.innerText = "¡100% de respuestas correctas! ¡Sos la mejor! 🎉🥰❤️";
+                    if (typeof confetti === "function") {
+                        confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+                    }
+                } else {
+                    resultado.innerText = `Acertaste ${aciertos} de 4. ¡Te amo igual mi vida! ❤️`;
+                }
+            }
+        }
 
-    function saveDrawing() {
-      localStorage.setItem('libreta_dibujo', canvas.toDataURL());
-    }
+        // LÓGICA DE RULETA DE CITAS
+        const ideasCitas = [
+            "🍔 Hamburguesas en Tasty o McDonald's + peli",
+            "🧉 Salir a tomar tereré al parque",
+            "👩‍🍳 Cocinar algo nuevo juntos",
+            "🌙 Caminar de noche juntos",
+            "🍦 Ir por un heladito",
+            "🎲 Noche de juegos de mesa",
+            "🎬 Ir al cine juntos",
+            "🍕 Pizza en casa viendo una peli"
+        ];
 
-    function getCoords(e) {
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return {
-        x: clientX - rect.left,
-        y: clientY - rect.top
-      };
-    }
+        let girando = false;
 
-    function startDrawing(e) {
-      drawing = true;
-      const coords = getCoords(e);
-      ctx.beginPath();
-      ctx.moveTo(coords.x, coords.y);
-    }
+        function girarRuleta() {
+            if (girando) return;
+            girando = true;
 
-    function draw(e) {
-      if (!drawing) return;
-      e.preventDefault();
-      const coords = getCoords(e);
-      ctx.lineTo(coords.x, coords.y);
-      ctx.stroke();
-    }
+            const display = document.getElementById('rouletteDisplay');
+            let velocidad = 50;
+            let giros = 0;
+            const girosTotales = 25;
 
-    function stopDrawing() {
-      if (drawing) {
-        drawing = false;
-        saveDrawing();
-      }
-    }
+            const intervalo = setInterval(() => {
+                const opcionRandom = ideasCitas[Math.floor(Math.random() * ideasCitas.length)];
+                display.innerText = opcionRandom;
+                giros++;
 
-    function limpiarCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      localStorage.removeItem('libreta_dibujo');
-    }
+                if (giros >= girosTotales) {
+                    clearInterval(intervalo);
+                    girando = false;
+                    
+                    if (typeof confetti === "function") {
+                        confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                    }
+                }
+            }, velocidad);
+        }
 
-    // Eventos Mouse y Táctiles
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseleave', stopDrawing);
+        // LÓGICA DE MÚSICA
+        const music = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicText = document.getElementById('musicText');
 
-    canvas.addEventListener('touchstart', startDrawing);
-    canvas.addEventListener('touchmove', draw);
-    canvas.addEventListener('touchend', stopDrawing);
-  </script>
+        function toggleMúsica() {
+            if (music.paused) {
+                music.play();
+                musicBtn.classList.add('playing');
+                musicIcon.innerText = '⏸️';
+                musicText.innerText = 'Pausar';
+            } else {
+                music.pause();
+                musicBtn.classList.remove('playing');
+                musicIcon.innerText = '🎵';
+                musicText.innerText = 'Música';
+            }
+        }
+
+        // Generador de corazones flotantes
+        function crearCorazones() {
+            const container = document.getElementById('heartsBg');
+            const simbolos = ['❤️', '💖', '💕', '💗', '💌'];
+            
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerText = simbolos[Math.floor(Math.random() * simbolos.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.fontSize = (Math.random() * 15 + 15) + 'px';
+                container.appendChild(heart);
+            }
+        }
+
+        // Contador
+        const fechaInicio = new Date(2026, 6, 12); 
+
+        function actualizarContador() {
+            const ahora = new Date();
+            const diferencia = ahora - fechaInicio;
+
+            if (diferencia < 0) {
+                document.getElementById('timer').innerText = "¡Casi llega el gran día!";
+                return;
+            }
+
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diferencia / (1000 * 60 * 60)) % 24);
+            const minutos = Math.floor((diferencia / 1000 / 60) % 60);
+            const segundos = Math.floor((diferencia / 1000) % 60);
+
+            document.getElementById('timer').innerText = 
+                `${dias} días, ${horas} horas, ${minutos} minutos y ${segundos} segundos`;
+        }
+
+        function verificarAniversario() {
+            const hoy = new Date();
+            const diaHoy = hoy.getDate();
+            const diaInicio = fechaInicio.getDate();
+
+            if (diaHoy === diaInicio) {
+                const banner = document.getElementById('anniversaryBanner');
+                const bannerText = document.getElementById('anniversaryText');
+                
+                let anos = hoy.getFullYear() - fechaInicio.getFullYear();
+                let meses = hoy.getMonth() - fechaInicio.getMonth();
+                
+                if (meses < 0) {
+                    anos--;
+                    meses += 12;
+                }
+                
+                let totalMeses = (anos * 12) + meses;
+
+                if (totalMeses > 0) {
+                    banner.style.display = 'block';
+
+                    if (meses === 0 && anos > 0) {
+                        bannerText.innerText = anos === 1 ? "Hoy cumplimos 1 año juntos! ❤️✨" : `Hoy cumplimos ${anos} años juntos! ❤️✨`;
+                    } else {
+                        bannerText.innerText = totalMeses === 1 ? "Hoy cumplimos 1 mes juntos! ❤️✨" : `Hoy cumplimos ${totalMeses} meses juntos! ❤️✨`;
+                    }
+
+                    if (typeof confetti === "function") {
+                        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                    }
+                }
+            }
+        }
+
+        function abrirModal(imagenSrc, textoDescripcion) {
+            document.getElementById('modalImg').src = imagenSrc;
+            document.getElementById('modalCaption').innerText = textoDescripcion;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        crearCorazones();
+        setInterval(actualizarContador, 1000);
+        actualizarContador();
+        verificarAniversario();
+    </script>
 </body>
 </html>
