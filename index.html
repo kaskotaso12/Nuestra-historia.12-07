@@ -421,7 +421,7 @@
             accent-color: #ff4d6d;
         }
 
-        /* REPRODUCTOR DE MÚSICA FLOTANTE CON MENÚ (ABAJO A LA DERECHA) */
+        /* REPRODUCTOR DE MÚSICA FLOTANTE CON MENÚ */
         .music-wrapper {
             position: fixed;
             bottom: 20px;
@@ -482,7 +482,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             margin-bottom: 8px;
-            width: 210px;
+            width: 220px;
             overflow: hidden;
             border: 1px solid #ffccd5;
             text-align: left;
@@ -522,6 +522,15 @@
             font-weight: bold;
             color: #ff4d6d;
             background: #fff0f3;
+        }
+
+        /* Contenedor Oculto para Reproductor YouTube */
+        #youtube-player {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Modal Galería */
@@ -595,7 +604,7 @@
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
             <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
             <div class="music-item" onclick="cambiarCancion(1)">🎧 Milo j – Fruto</div>
-            <div class="music-item" onclick="cambiarCancion(2)">🔥 YSY A – Lleno de Usuarios</div>
+            <div class="music-item" onclick="cambiarCancion(2)">🔥 YSY A – Cómo Chilla Ella</div>
             <div class="music-item" onclick="cambiarCancion(3)">🐰 Bad Bunny – Ojitos Lindos</div>
         </div>
 
@@ -607,10 +616,13 @@
         </div>
     </div>
 
-    <!-- AUDIO DE FONDO -->
+    <!-- REPRODUCTOR MP3 PARA PIANO -->
     <audio id="bgMusic" loop>
         <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- REPRODUCTOR INVISIBLE DE YOUTUBE PARA ARTISTAS -->
+    <div id="youtube-player"></div>
 
     <header>
         <h1>Nuestra Historia ❤️</h1>
@@ -739,6 +751,9 @@
         </div>
     </div>
 
+    <!-- SCRIPT API YOUTUBE -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
     <script>
         /* ==========================================
            1. LÓGICA DE LA TRIVIA INTERACTIVA
@@ -830,7 +845,7 @@
 
 
         /* ==========================================
-           2. LÓGICA DE DIBUJO (CON BORRADOR Y TAMAÑO)
+           2. LÓGICA DE DIBUJO
            ========================================== */
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
@@ -1000,30 +1015,60 @@
 
 
         /* ==========================================
-           4. LÓGICA DE MÚSICA CON MENÚ SELECCIONABLE
+           4. MÚSICA CON YOUTUBE + MP3
            ========================================== */
         const playlist = [
-            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" },
-            { title: "Milo j - Fruto", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a221f7.mp3?filename=acoustic-guitars-relaxing-10884.mp3" },
-            { title: "YSY A - Lleno de Usuarios", src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=hip-hop-beat-10332.mp3" },
-            { title: "Bad Bunny - Ojitos Lindos", src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_99392e2f38.mp3?filename=reggaeton-beat-1234.mp3" }
+            { title: "Piano Romántico", type: "mp3" },
+            { title: "Milo j - Fruto", type: "yt", ytId: "3mZ9Q4fK83A" },
+            { title: "YSY A - Cómo Chilla Ella", type: "yt", ytId: "k-Euh8GvV10" },
+            { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" }
         ];
 
+        let currentTrack = 0;
+        let ytPlayer = null;
+        let ytReady = false;
+
         const music = document.getElementById('bgMusic');
-        const musicSource = document.getElementById('musicSource');
         const musicIcon = document.getElementById('musicIcon');
         const musicText = document.getElementById('musicText');
         const musicDropdown = document.getElementById('musicDropdown');
 
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                height: '0',
+                width: '0',
+                videoId: '3mZ9Q4fK83A',
+                playerVars: { 'autoplay': 0, 'controls': 0 },
+                events: {
+                    'onReady': () => { ytReady = true; }
+                }
+            });
+        }
+
         function toggleMúsica() {
-            if (music.paused) {
-                music.play();
-                musicIcon.innerText = '⏸️';
-                musicText.innerText = 'Pausar';
-            } else {
-                music.pause();
-                musicIcon.innerText = '🎵';
-                musicText.innerText = 'Música';
+            const track = playlist[currentTrack];
+            
+            if (track.type === "mp3") {
+                if (music.paused) {
+                    music.play();
+                    musicIcon.innerText = '⏸️';
+                    musicText.innerText = 'Pausar';
+                } else {
+                    music.pause();
+                    musicIcon.innerText = '🎵';
+                    musicText.innerText = 'Música';
+                }
+            } else if (track.type === "yt" && ytReady) {
+                const state = ytPlayer.getPlayerState();
+                if (state === YT.PlayerState.PLAYING) {
+                    ytPlayer.pauseVideo();
+                    musicIcon.innerText = '🎵';
+                    musicText.innerText = 'Música';
+                } else {
+                    ytPlayer.playVideo();
+                    musicIcon.innerText = '⏸️';
+                    musicText.innerText = 'Pausar';
+                }
             }
         }
 
@@ -1033,11 +1078,20 @@
         }
 
         function cambiarCancion(index) {
-            const selected = playlist[index];
-            musicSource.src = selected.src;
-            music.load();
-            music.play();
-            
+            currentTrack = index;
+            const track = playlist[index];
+
+            // Detener ambos reproductores
+            music.pause();
+            if (ytReady) ytPlayer.stopVideo();
+
+            if (track.type === "mp3") {
+                music.play();
+            } else if (track.type === "yt" && ytReady) {
+                ytPlayer.loadVideoById(track.ytId);
+                ytPlayer.playVideo();
+            }
+
             musicIcon.innerText = '⏸️';
             musicText.innerText = 'Pausar';
 
