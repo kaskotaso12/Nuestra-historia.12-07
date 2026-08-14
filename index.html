@@ -523,14 +523,6 @@
             background: #fff0f3;
         }
 
-        #youtube-player {
-            position: absolute;
-            width: 0;
-            height: 0;
-            opacity: 0;
-            pointer-events: none;
-        }
-
         /* Modal Galería */
         .modal {
             display: none;
@@ -596,7 +588,7 @@
     <!-- FONDO DE CORAZONES -->
     <div class="hearts-background" id="heartsBg"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA CON MENÚ DE TRES RAYITAS -->
+    <!-- REPRODUCTOR DE MÚSICA CON MENÚ -->
     <div class="music-wrapper">
         <div class="music-dropdown" id="musicDropdown">
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
@@ -614,13 +606,10 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR DE AUDIO PRINCIPAL -->
+    <!-- REPRODUCTOR DE AUDIO CON CADA ARCHIVO LOCAL -->
     <audio id="bgMusic" loop>
-        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
+        <source id="musicSource" src="piano.mp3" type="audio/mpeg">
     </audio>
-
-    <!-- REPRODUCTOR INVISIBLE DE YOUTUBE PARA BAD BUNNY -->
-    <div id="youtube-player"></div>
 
     <header>
         <h1>Nuestra Historia ❤️</h1>
@@ -748,9 +737,6 @@
             <p id="modalCaption"></p>
         </div>
     </div>
-
-    <!-- SCRIPT API YOUTUBE -->
-    <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
         /* ==========================================
@@ -1013,18 +999,16 @@
 
 
         /* ==========================================
-           4. MÚSICA CON YOUTUBE Y MP3 DIRECTO
+           4. REPRODUCTOR DE MÚSICA LOCAL
            ========================================== */
         const playlist = [
-            { title: "Piano Romántico", type: "mp3", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" },
-            { title: "Milo j - Fruto", type: "mp3", src: "https://cdn.soundstat.com/audio/milo-j-fruto.mp3" },
-            { title: "YSY A - Cómo Chilla Ella", type: "mp3", src: "https://cdn.soundstat.com/audio/ysy-a-como-chilla-ella.mp3" },
-            { title: "Bad Bunny - Ojitos Lindos", type: "yt", ytId: "10EX-_h4pYc" }
+            { title: "Piano Romántico", src: "piano.mp3" },
+            { title: "Milo j - Fruto", src: "fruto.mp3" },
+            { title: "YSY A - Cómo Chilla Ella", src: "como-chilla-ella.mp3" },
+            { title: "Bad Bunny - Ojitos Lindos", src: "ojitos-lindos.mp3" }
         ];
 
         let currentTrack = 0;
-        let ytPlayer = null;
-        let ytReady = false;
 
         const music = document.getElementById('bgMusic');
         const musicSource = document.getElementById('musicSource');
@@ -1032,42 +1016,18 @@
         const musicText = document.getElementById('musicText');
         const musicDropdown = document.getElementById('musicDropdown');
 
-        function onYouTubeIframeAPIReady() {
-            ytPlayer = new YT.Player('youtube-player', {
-                height: '0',
-                width: '0',
-                videoId: '10EX-_h4pYc',
-                playerVars: { 'autoplay': 0, 'controls': 0 },
-                events: {
-                    'onReady': () => { ytReady = true; }
-                }
-            });
-        }
-
         function toggleMúsica() {
-            const track = playlist[currentTrack];
-
-            if (track.type === "mp3") {
-                if (music.paused) {
-                    music.play();
+            if (music.paused) {
+                music.play().then(() => {
                     musicIcon.innerText = '⏸️';
                     musicText.innerText = 'Pausar';
-                } else {
-                    music.pause();
-                    musicIcon.innerText = '🎵';
-                    musicText.innerText = 'Música';
-                }
-            } else if (track.type === "yt" && ytReady) {
-                const state = ytPlayer.getPlayerState();
-                if (state === YT.PlayerState.PLAYING) {
-                    ytPlayer.pauseVideo();
-                    musicIcon.innerText = '🎵';
-                    musicText.innerText = 'Música';
-                } else {
-                    ytPlayer.playVideo();
-                    musicIcon.innerText = '⏸️';
-                    musicText.innerText = 'Pausar';
-                }
+                }).catch(err => {
+                    console.log("Se requiere interacción para reproducir el audio.", err);
+                });
+            } else {
+                music.pause();
+                musicIcon.innerText = '🎵';
+                musicText.innerText = 'Música';
             }
         }
 
@@ -1081,19 +1041,15 @@
             const track = playlist[index];
 
             music.pause();
-            if (ytReady) ytPlayer.stopVideo();
-
-            if (track.type === "mp3") {
-                musicSource.src = track.src;
-                music.load();
-                music.play();
-            } else if (track.type === "yt" && ytReady) {
-                ytPlayer.loadVideoById(track.ytId);
-                ytPlayer.playVideo();
-            }
-
-            musicIcon.innerText = '⏸️';
-            musicText.innerText = 'Pausar';
+            musicSource.src = track.src;
+            music.load();
+            
+            music.play().then(() => {
+                musicIcon.innerText = '⏸️';
+                musicText.innerText = 'Pausar';
+            }).catch(err => {
+                console.log("Error al reproducir audio:", err);
+            });
 
             const items = document.querySelectorAll('.music-item');
             items.forEach((item, idx) => {
