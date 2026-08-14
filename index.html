@@ -206,7 +206,7 @@
 
         @media (max-width: 768px) {
             .interactive-grid {
-                grid-template-columns: 1fr; /* Se apila en celulares */
+                grid-template-columns: 1fr;
             }
         }
 
@@ -421,28 +421,108 @@
             accent-color: #ff4d6d;
         }
 
-        /* BOTÓN FLOTANTE DE MÚSICA (ABAJO A LA DERECHA) */
-        .music-btn {
+        /* REPRODUCTOR DE MÚSICA FLOTANTE CON MENÚ (ABAJO A LA DERECHA) */
+        .music-wrapper {
             position: fixed;
             bottom: 20px;
             right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .music-btn-container {
             background: #ff4d6d;
             color: white;
-            border: none;
             border-radius: 50px;
-            padding: 10px 18px;
-            font-size: 0.9em;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 4px 8px 4px 14px;
             box-shadow: 0 6px 18px rgba(255, 77, 109, 0.4);
             display: flex;
             align-items: center;
             gap: 8px;
-            z-index: 999;
-            transition: transform 0.2s;
         }
 
-        .music-btn:hover { transform: scale(1.08); }
+        .music-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 0;
+        }
+
+        .music-menu-btn {
+            background: rgba(255, 255, 255, 0.25);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .music-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Menú Desplegable de Canciones */
+        .music-dropdown {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            margin-bottom: 8px;
+            width: 210px;
+            overflow: hidden;
+            border: 1px solid #ffccd5;
+            text-align: left;
+        }
+
+        .music-dropdown.show {
+            display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        .music-dropdown-header {
+            background: #fff0f3;
+            padding: 8px 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #ff4d6d;
+            border-bottom: 1px solid #ffccd5;
+        }
+
+        .music-item {
+            padding: 10px 12px;
+            font-size: 0.85em;
+            color: #444;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .music-item:hover {
+            background: #ffe6ea;
+            color: #ff2a55;
+        }
+
+        .music-item.active {
+            font-weight: bold;
+            color: #ff4d6d;
+            background: #fff0f3;
+        }
 
         /* Modal Galería */
         .modal {
@@ -509,14 +589,27 @@
     <!-- FONDO DE CORAZONES -->
     <div class="hearts-background" id="heartsBg"></div>
 
-    <!-- BOTÓN DE MÚSICA (ABAJO A LA DERECHA) -->
-    <button class="music-btn" id="musicBtn" onclick="toggleMúsica()">
-        <span id="musicIcon">🎵</span> <span id="musicText">Música</span>
-    </button>
+    <!-- REPRODUCTOR DE MÚSICA CON MENÚ DE TRES RAYITAS -->
+    <div class="music-wrapper">
+        <div class="music-dropdown" id="musicDropdown">
+            <div class="music-dropdown-header">Elegí una canción 🎵</div>
+            <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
+            <div class="music-item" onclick="cambiarCancion(1)">🎧 Milo j – Fruto</div>
+            <div class="music-item" onclick="cambiarCancion(2)">🔥 YSY A – Lleno de Usuarios</div>
+            <div class="music-item" onclick="cambiarCancion(3)">🐰 Bad Bunny – Ojitos Lindos</div>
+        </div>
+
+        <div class="music-btn-container">
+            <button class="music-btn" id="musicBtn" onclick="toggleMúsica()">
+                <span id="musicIcon">🎵</span> <span id="musicText">Música</span>
+            </button>
+            <button class="music-menu-btn" onclick="toggleMenuMusica(event)" title="Elegir canción">☰</button>
+        </div>
+    </div>
 
     <!-- AUDIO DE FONDO -->
     <audio id="bgMusic" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
+        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
     </audio>
 
     <header>
@@ -766,7 +859,7 @@
         function actualizarEstiloPincel() {
             ctx.lineWidth = brushSize.value;
             if (modoBorrador) {
-                ctx.strokeStyle = '#ffffff'; // Color blanco para borrar
+                ctx.strokeStyle = '#ffffff';
             } else {
                 ctx.strokeStyle = colorPicker.value;
             }
@@ -907,12 +1000,20 @@
 
 
         /* ==========================================
-           4. LÓGICA DE MÚSICA, CONTADOR Y CORAZONES
+           4. LÓGICA DE MÚSICA CON MENÚ SELECCIONABLE
            ========================================== */
+        const playlist = [
+            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" },
+            { title: "Milo j - Fruto", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a221f7.mp3?filename=acoustic-guitars-relaxing-10884.mp3" },
+            { title: "YSY A - Lleno de Usuarios", src: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=hip-hop-beat-10332.mp3" },
+            { title: "Bad Bunny - Ojitos Lindos", src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_99392e2f38.mp3?filename=reggaeton-beat-1234.mp3" }
+        ];
+
         const music = document.getElementById('bgMusic');
-        const musicBtn = document.getElementById('musicBtn');
+        const musicSource = document.getElementById('musicSource');
         const musicIcon = document.getElementById('musicIcon');
         const musicText = document.getElementById('musicText');
+        const musicDropdown = document.getElementById('musicDropdown');
 
         function toggleMúsica() {
             if (music.paused) {
@@ -926,6 +1027,39 @@
             }
         }
 
+        function toggleMenuMusica(event) {
+            event.stopPropagation();
+            musicDropdown.classList.toggle('show');
+        }
+
+        function cambiarCancion(index) {
+            const selected = playlist[index];
+            musicSource.src = selected.src;
+            music.load();
+            music.play();
+            
+            musicIcon.innerText = '⏸️';
+            musicText.innerText = 'Pausar';
+
+            const items = document.querySelectorAll('.music-item');
+            items.forEach((item, idx) => {
+                if (idx === index) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+
+            musicDropdown.classList.remove('show');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.music-wrapper')) {
+                musicDropdown.classList.remove('show');
+            }
+        });
+
+
+        /* ==========================================
+           5. CONTADOR, CORAZONES Y ANIVERSARIO
+           ========================================== */
         function crearCorazones() {
             const container = document.getElementById('heartsBg');
             const simbolos = ['❤️', '💖', '💕', '💗', '💌'];
