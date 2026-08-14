@@ -425,7 +425,7 @@
             accent-color: #ff4d6d;
         }
 
-        /* REPRODUCTOR DE MÚSICA SPOTIFY FLOTANTE */
+        /* REPRODUCTOR DE MÚSICA FLOTANTE */
         .music-wrapper {
             position: fixed;
             bottom: 20px;
@@ -590,15 +590,21 @@
 </head>
 <body>
 
+    <!-- AUDIO DEL PIANO PREDETERMINADO -->
+    <audio id="pianoAudio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112199.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- FONDO DE CORAZONES -->
     <div class="hearts-background" id="heartsBg"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA CON SPOTIFY EMBEDDED -->
+    <!-- REPRODUCTOR DE MÚSICA -->
     <div class="music-wrapper">
         <div class="music-dropdown" id="musicDropdown">
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
-            <div class="music-item" onclick="cambiarTrackSpotify(0)">🎸 Babasónicos – Puesto</div>
-            <div class="music-item" onclick="cambiarTrackSpotify(1)">🎸 Airbag – Cae el Sol</div>
+            <div class="music-item active" id="itemPiano" onclick="seleccionarCancion('piano')">🎹 Piano Romántico (Predeterminada)</div>
+            <div class="music-item" id="itemBabasonicos" onclick="seleccionarCancion('babasonicos')">🎸 Babasónicos – Puesto</div>
+            <div class="music-item" id="itemAirbag" onclick="seleccionarCancion('airbag')">🎸 Airbag – Cae el Sol</div>
         </div>
 
         <!-- Contenedor del IFrame de Spotify -->
@@ -616,8 +622,8 @@
         </div>
 
         <div class="music-btn-container">
-            <button class="music-btn" id="musicBtn" onclick="toggleMenuMusica(event)">
-                <span id="musicIcon">🎵</span> <span id="musicText">Canciones</span>
+            <button class="music-btn" id="musicBtn" onclick="togglePlayPiano()">
+                <span id="musicIcon">▶️</span> <span id="musicText">Piano Romántico</span>
             </button>
             <button class="music-menu-btn" onclick="toggleMenuMusica(event)" title="Elegir canción">☰</button>
         </div>
@@ -843,7 +849,6 @@
         /* ==========================================
            2. LIBRETA DE DIBUJO PERSISTENTE Y COLABORATIVA
            ========================================== */
-        // Base de datos Firebase Realtime activa y lista para sincronizar
         const firebaseConfig = {
             databaseURL: "https://nuestra-historia-default-rtdb.firebaseio.com/"
         };
@@ -973,7 +978,6 @@
             }
         }
 
-        // Sincronización en directo entre dispositivos
         if (strokesRef) {
             strokesRef.on('child_added', (snapshot) => {
                 const stroke = snapshot.val();
@@ -1005,7 +1009,7 @@
            ========================================== */
         const ideasCitas = [
             "🍔 Hamburguesas en Tasty o McDonald's + peli",
-            "Mateando al parque 🧉",
+            "Tereré bien frío 🧉",
             "👩‍🍳 Cocinar algo nuevo juntos",
             "🌙 Caminar de noche juntos",
             "🍦 Ir por un heladito",
@@ -1042,32 +1046,69 @@
 
 
         /* ==========================================
-           4. MÚSICA CON EMBEDS OFICIALES DE SPOTIFY
+           4. MÚSICA (PIANO PREDETERMINADO + SPOTIFY)
            ========================================== */
-        const spotifyPlaylist = [
-            { title: "Babasónicos – Puesto", embedUrl: "https://open.spotify.com/embed/track/5zpZUFF7YyPG90nkR88RYd" },
-            { title: "Airbag – Cae el Sol", embedUrl: "https://open.spotify.com/embed/track/1qAMb1y3o7Olwm8pYTuzyV" }
-        ];
-
+        const pianoAudio = document.getElementById('pianoAudio');
         const spotifyPlayer = document.getElementById('spotifyPlayer');
         const musicDropdown = document.getElementById('musicDropdown');
+        const musicIcon = document.getElementById('musicIcon');
+        const musicText = document.getElementById('musicText');
+
+        let modoActual = 'piano'; // 'piano', 'babasonicos', 'airbag'
 
         function toggleMenuMusica(event) {
             event.stopPropagation();
             musicDropdown.classList.toggle('show');
         }
 
-        function cambiarTrackSpotify(index) {
-            const track = spotifyPlaylist[index];
-            
-            spotifyPlayer.src = track.embedUrl + "?utm_source=generator&theme=0";
-            spotifyPlayer.style.display = "block";
+        function togglePlayPiano() {
+            if (modoActual !== 'piano') {
+                seleccionarCancion('piano');
+                return;
+            }
 
-            const items = document.querySelectorAll('.music-item');
-            items.forEach((item, idx) => {
-                if (idx === index) item.classList.add('active');
-                else item.classList.remove('active');
-            });
+            if (pianoAudio.paused) {
+                pianoAudio.play().then(() => {
+                    musicIcon.innerText = "⏸️";
+                }).catch(e => console.log("Permiso de audio requerido"));
+            } else {
+                pianoAudio.pause();
+                musicIcon.innerText = "▶️";
+            }
+        }
+
+        function seleccionarCancion(tipo) {
+            modoActual = tipo;
+            document.querySelectorAll('.music-item').forEach(item => item.classList.remove('active'));
+
+            if (tipo === 'piano') {
+                spotifyPlayer.style.display = "none";
+                spotifyPlayer.src = "";
+                document.getElementById('itemPiano').classList.add('active');
+                musicText.innerText = "Piano Romántico";
+                
+                pianoAudio.play().then(() => {
+                    musicIcon.innerText = "⏸️";
+                }).catch(e => {
+                    musicIcon.innerText = "▶️";
+                });
+
+            } else if (tipo === 'babasonicos') {
+                pianoAudio.pause();
+                document.getElementById('itemBabasonicos').classList.add('active');
+                musicIcon.innerText = "🎵";
+                musicText.innerText = "Babasónicos";
+                spotifyPlayer.src = "https://open.spotify.com/embed/track/5zpZUFF7YyPG90nkR88RYd?utm_source=generator&theme=0";
+                spotifyPlayer.style.display = "block";
+
+            } else if (tipo === 'airbag') {
+                pianoAudio.pause();
+                document.getElementById('itemAirbag').classList.add('active');
+                musicIcon.innerText = "🎵";
+                musicText.innerText = "Airbag";
+                spotifyPlayer.src = "https://open.spotify.com/embed/track/1qAMb1y3o7Olwm8pYTuzyV?utm_source=generator&theme=0";
+                spotifyPlayer.style.display = "block";
+            }
 
             musicDropdown.classList.remove('show');
         }
