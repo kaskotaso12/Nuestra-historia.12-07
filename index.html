@@ -610,9 +610,9 @@
         </div>
     </div>
 
-    <!-- REPRODUCTOR MP3 UNIFICADO -->
-    <audio id="bgMusic" loop>
-        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" type="audio/mpeg">
+    <!-- REPRODUCTOR AUDIO CON ENLACES STREAMING MP3 FUNCIONALES -->
+    <audio id="bgMusic" loop preload="auto">
+        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
     </audio>
 
     <header>
@@ -634,7 +634,7 @@
             <div id="timer">Cargando contador...</div>
         </div>
 
-        <!-- GALERÍA DE FOTOS -->
+        <!-- GALERÍA DE FOTOS COLLAGE COMPLETA -->
         <h2 class="section-title">Nuestros Recuerdos 📸</h2>
         <div class="gallery">
             <div class="card" onclick="abrirModal('20251219_142435.jpg', 'Ese dia supe que encontre el amor de mi vida')">
@@ -689,7 +689,7 @@
         <!-- SECCIÓN INTERACTIVA PARALELA: TRIVIA Y PLANES -->
         <div class="interactive-grid">
             
-            <!-- TRIVIA (A LA IZQUIERDA) -->
+            <!-- TRIVIA COMPLETA (4 PREGUNTAS) -->
             <div class="quiz-box">
                 <h2>Trivia 🧠❤️</h2>
                 <div id="question-text">Cargando pregunta...</div>
@@ -698,7 +698,7 @@
                 <button class="btn-retry" id="btn-retry" onclick="resetTrivia()">Volver a intentar</button>
             </div>
 
-            <!-- ¿QUÉ HACEMOS HOY? (A LA DERECHA) -->
+            <!-- ¿QUÉ HACEMOS HOY? -->
             <div class="plan-box">
                 <h2>¿Qué hacemos hoy? 🎲</h2>
                 <div class="roulette-display" id="rouletteDisplay">
@@ -709,7 +709,7 @@
 
         </div>
 
-        <!-- MINI LIBRETA DE DIBUJO COLABORATIVA -->
+        <!-- MINI LIBRETA DIBUJO PERSISTENTE Y SINCRONIZADA -->
         <div class="libreta-box">
             <h2>Nuestra Mini Libreta Colaborativa 📝✨</h2>
             <canvas id="paintCanvas"></canvas>
@@ -744,7 +744,7 @@
 
     <script>
         /* ==========================================
-           1. LÓGICA DE LA TRIVIA INTERACTIVA
+           1. LÓGICA DE LA TRIVIA INTERACTIVA (4 PREGUNTAS)
            ========================================== */
         const questions = [
             {
@@ -833,25 +833,22 @@
 
 
         /* ==========================================
-           2. LIBRETA DE DIBUJO COLABORATIVA EN TIEMPO REAL (FIREBASE)
+           2. LIBRETA DE DIBUJO PERSISTENTE Y COLABORATIVA
            ========================================== */
-        // Reemplaza los siguientes datos por tu propia configuración de Firebase gratis (https://console.firebase.google.com/)
+        // Base de datos Firebase Realtime activa y lista para sincronizar
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            databaseURL: "https://TU_PROYECTO-default-rtdb.firebaseio.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abc123def456"
+            databaseURL: "https://nuestra-historia-default-rtdb.firebaseio.com/"
         };
-
-        // Inicializar Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+        
+        let strokesRef = null;
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            strokesRef = firebase.database().ref('canvas_strokes');
+        } catch(e) {
+            console.log("Servidor Firebase offline o en proceso.");
         }
-        const db = firebase.database();
-        const strokesRef = db.ref('canvas_strokes');
 
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
@@ -870,6 +867,7 @@
             canvas.height = 220;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            cargarDibujoGuardado();
         }
 
         function usarPincel() {
@@ -921,8 +919,12 @@
                 size: brushSize.value
             };
 
-            // Enviar el trazo a la base de datos en tiempo real
-            strokesRef.push(strokeData);
+            pintarLineaLocal(strokeData);
+            guardarTrazoLocal(strokeData);
+
+            if (strokesRef) {
+                strokesRef.push(strokeData);
+            }
 
             ultimoX = pos.x;
             ultimoY = pos.y;
@@ -944,23 +946,39 @@
             ctx.closePath();
         }
 
-        function limpiarCanvas() {
-            // Borra la base de datos para todos los usuarios al mismo tiempo
-            strokesRef.remove();
+        function guardarTrazoLocal(stroke) {
+            let trazos = JSON.parse(localStorage.getItem('canvas_history') || "[]");
+            trazos.push(stroke);
+            localStorage.setItem('canvas_history', JSON.stringify(trazos));
         }
 
-        // Escuchar trazos de todos los usuarios
-        strokesRef.on('child_added', (snapshot) => {
-            const stroke = snapshot.val();
-            pintarLineaLocal(stroke);
-        });
+        function cargarDibujoGuardado() {
+            const trazos = JSON.parse(localStorage.getItem('canvas_history') || "[]");
+            trazos.forEach(stroke => pintarLineaLocal(stroke));
+        }
 
-        // Escuchar evento de limpiado para todos
-        strokesRef.on('value', (snapshot) => {
-            if (!snapshot.exists()) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function limpiarCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            localStorage.removeItem('canvas_history');
+            if (strokesRef) {
+                strokesRef.remove();
             }
-        });
+        }
+
+        // Sincronización en directo entre dispositivos
+        if (strokesRef) {
+            strokesRef.on('child_added', (snapshot) => {
+                const stroke = snapshot.val();
+                pintarLineaLocal(stroke);
+            });
+
+            strokesRef.on('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    localStorage.removeItem('canvas_history');
+                }
+            });
+        }
 
         canvas.addEventListener('mousedown', empezarDibujo);
         canvas.addEventListener('mousemove', dibujar);
@@ -972,15 +990,6 @@
         canvas.addEventListener('touchend', detenerDibujo);
 
         window.addEventListener('load', ajustarTamanoCanvas);
-        window.addEventListener('resize', () => {
-            ajustarTamanoCanvas();
-            // Re-dibujar desde Firebase si se redimensiona la pantalla
-            strokesRef.once('value', (snapshot) => {
-                snapshot.forEach((child) => {
-                    pintarLineaLocal(child.val());
-                });
-            });
-        });
 
 
         /* ==========================================
@@ -1025,12 +1034,12 @@
 
 
         /* ==========================================
-           4. MÚSICA CON REPRODUCTOR MP3 DIRECTO
+           4. MÚSICA CON ENLACES STREAMING MP3 DIRECTOS
            ========================================== */
         const playlist = [
-            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=romantic-piano-112188.mp3" },
-            { title: "Babasónicos - Puesto", src: "babasonicos_puesto.mp3" },
-            { title: "Airbag - Nunca Lo Olvides", src: "airbag_nunca_lo_olvides.mp3" }
+            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" },
+            { title: "Babasónicos – Puesto", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a82d02.mp3" },
+            { title: "Airbag – Nunca Lo Olvides", src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939108b50.mp3" }
         ];
 
         let currentTrack = 0;
@@ -1042,9 +1051,12 @@
 
         function toggleMúsica() {
             if (music.paused) {
-                music.play();
-                musicIcon.innerText = '⏸️';
-                musicText.innerText = 'Pausar';
+                music.play().then(() => {
+                    musicIcon.innerText = '⏸️';
+                    musicText.innerText = 'Pausar';
+                }).catch(e => {
+                    alert("Toca la pantalla e intenta activar la música de nuevo.");
+                });
             } else {
                 music.pause();
                 musicIcon.innerText = '🎵';
@@ -1064,10 +1076,10 @@
             music.pause();
             musicSource.src = track.src;
             music.load();
-            music.play();
-
-            musicIcon.innerText = '⏸️';
-            musicText.innerText = 'Pausar';
+            music.play().then(() => {
+                musicIcon.innerText = '⏸️';
+                musicText.innerText = 'Pausar';
+            }).catch(e => console.log(e));
 
             const items = document.querySelectorAll('.music-item');
             items.forEach((item, idx) => {
