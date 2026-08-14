@@ -847,8 +847,9 @@
 
 
         /* ==========================================
-           2. LIBRETA DE DIBUJO PERSISTENTE Y COLABORATIVA
+           2. LIBRETA DE DIBUJO EN TIEMPO REAL Y PERSISTENTE
            ========================================== */
+        // Configuración de la base de datos para sincronizar live
         const firebaseConfig = {
             databaseURL: "https://nuestra-historia-default-rtdb.firebaseio.com/"
         };
@@ -860,7 +861,7 @@
             }
             strokesRef = firebase.database().ref('canvas_strokes');
         } catch(e) {
-            console.log("Servidor Firebase offline o en proceso.");
+            console.log("Servidor Firebase configurándose...");
         }
 
         const canvas = document.getElementById('paintCanvas');
@@ -880,7 +881,7 @@
             canvas.height = 220;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            cargarDibujoGuardado();
+            redibujarTodoGuardado();
         }
 
         function usarPincel() {
@@ -932,9 +933,11 @@
                 size: brushSize.value
             };
 
+            // Pintar inmediatamente en pantalla local
             pintarLineaLocal(strokeData);
             guardarTrazoLocal(strokeData);
 
+            // Transmitir en tiempo real al otro dispositivo
             if (strokesRef) {
                 strokesRef.push(strokeData);
             }
@@ -965,7 +968,7 @@
             localStorage.setItem('canvas_history', JSON.stringify(trazos));
         }
 
-        function cargarDibujoGuardado() {
+        function redibujarTodoGuardado() {
             const trazos = JSON.parse(localStorage.getItem('canvas_history') || "[]");
             trazos.forEach(stroke => pintarLineaLocal(stroke));
         }
@@ -978,10 +981,16 @@
             }
         }
 
+        // ESCUCHAR DIBUJOS EN TIEMPO REAL DESDE EL OTRO DISPOSITIVO
         if (strokesRef) {
             strokesRef.on('child_added', (snapshot) => {
                 const stroke = snapshot.val();
                 pintarLineaLocal(stroke);
+                
+                // Guardar localmente para que persista al recargar
+                let trazos = JSON.parse(localStorage.getItem('canvas_history') || "[]");
+                trazos.push(stroke);
+                localStorage.setItem('canvas_history', JSON.stringify(trazos));
             });
 
             strokesRef.on('value', (snapshot) => {
@@ -1002,6 +1011,7 @@
         canvas.addEventListener('touchend', detenerDibujo);
 
         window.addEventListener('load', ajustarTamanoCanvas);
+        window.addEventListener('resize', ajustarTamanoCanvas);
 
 
         /* ==========================================
@@ -1054,7 +1064,7 @@
         const musicIcon = document.getElementById('musicIcon');
         const musicText = document.getElementById('musicText');
 
-        let modoActual = 'piano'; // 'piano', 'babasonicos', 'airbag'
+        let modoActual = 'piano';
 
         function toggleMenuMusica(event) {
             event.stopPropagation();
