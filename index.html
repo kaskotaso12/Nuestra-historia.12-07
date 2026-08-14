@@ -9,7 +9,7 @@
 
     <title>Nuestra Historia ❤️</title>
 
-    <!-- Librería para el confeti en aniversarios y citas -->
+    <!-- Librería para el confeti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
     
     <style>
@@ -50,14 +50,8 @@
         }
 
         @keyframes floatUp {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-110vh) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
         }
 
         header {
@@ -125,14 +119,10 @@
             padding: 25px;
             border-radius: 16px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
-        .roulette-box h2 {
-            margin-top: 0;
-            color: #d62828;
-            font-size: 1.8em;
-        }
+        .roulette-box h2 { margin-top: 0; color: #d62828; font-size: 1.8em; }
 
         .roulette-display {
             background: #fff0f3;
@@ -147,7 +137,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
         }
 
         .spin-btn {
@@ -163,13 +152,163 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .spin-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(255, 77, 109, 0.5);
+        .spin-btn:hover { transform: scale(1.05); }
+
+        /* SECCIÓN TRIVIA */
+        .quiz-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+            text-align: left;
         }
 
-        .spin-btn:active {
-            transform: scale(0.98);
+        .quiz-box h2 {
+            margin-top: 0;
+            color: #d62828;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .quiz-item {
+            margin-bottom: 20px;
+            background: #fff0f3;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .quiz-item p {
+            font-weight: bold;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+
+        .quiz-btn {
+            background: white;
+            border: 2px solid #ffccd5;
+            color: #444;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .quiz-btn:hover {
+            border-color: #ff758c;
+            background: #ffe6ea;
+        }
+
+        .quiz-btn.correct {
+            background: #2ec4b6 !important;
+            color: white !important;
+            border-color: #2ec4b6 !important;
+        }
+
+        .quiz-btn.incorrect {
+            background: #e63946 !important;
+            color: white !important;
+            border-color: #e63946 !important;
+        }
+
+        #quizResult {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #d62828;
+            margin-top: 15px;
+        }
+
+        /* SECCIÓN MINI LIBRETA DE DIBUJO */
+        .drawing-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            margin-bottom: 40px;
+        }
+
+        .drawing-box h2 {
+            margin-top: 0;
+            color: #d62828;
+            font-size: 1.8em;
+        }
+
+        .canvas-container {
+            position: relative;
+            margin: 15px auto;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        canvas {
+            background: #ffffff;
+            border: 2px dashed #ff758c;
+            border-radius: 12px;
+            cursor: crosshair;
+            touch-action: none; /* Evita desplazar la pantalla al dibujar en celular */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.03);
+            width: 100%;
+            height: 300px;
+            display: block;
+        }
+
+        .drawing-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .drawing-btn {
+            background: white;
+            border: 2px solid #ffccd5;
+            color: #444;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .drawing-btn:hover {
+            border-color: #ff4d6d;
+            background: #ffe6ea;
+        }
+
+        .drawing-btn.active {
+            background: #ff4d6d;
+            color: white;
+            border-color: #ff4d6d;
+        }
+
+        .color-picker {
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
         }
 
         h2.section-title {
@@ -366,11 +505,77 @@
         <!-- RULETA DE CITAS -->
         <div class="roulette-box">
             <h2>¿Qué hacemos hoy? 🎲</h2>
-            <p>Tocá el botón para elegir nuestra próxima cita al azar:</p>
+            <p style="text-align: center;">Tocá el botón para elegir nuestra próxima cita al azar:</p>
             <div class="roulette-display" id="rouletteDisplay">
                 Haz clic abajo para elegir 👇
             </div>
-            <button class="spin-btn" onclick="girarRuleta()">Girar Ruleta 🎰</button>
+            <div style="text-align: center;">
+                <button class="spin-btn" onclick="girarRuleta()">Girar Ruleta 🎰</button>
+            </div>
+        </div>
+
+        <!-- TRIVIA: ¿QUÉ TANTO NOS CONOCEMOS? -->
+        <div class="quiz-box">
+            <h2>Trivia: ¿Qué tanto sabés de nosotros? 🧠❤️</h2>
+            
+            <div class="quiz-item">
+                <p>1. ¿Dónde fue uno de nuestros lugares más especiales compartiendo una gran pasión?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 1, true)">Cancha de Independiente 🔴</button>
+                    <button class="quiz-btn" onclick="responder(this, 1, false)">Cine 🍿</button>
+                    <button class="quiz-btn" onclick="responder(this, 1, false)">En un shopping 🛍️</button>
+                    <button class="quiz-btn" onclick="responder(this, 1, false)">Un recital de rock 🎸</button>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. ¿Cuál es nuestra bebida infalible para salir a tomar en un día copado?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 2, false)">Café helado ☕</button>
+                    <button class="quiz-btn" onclick="responder(this, 2, true)">Tereré bien frío 🧉</button>
+                    <button class="quiz-btn" onclick="responder(this, 2, false)">Gaseosa 🥤</button>
+                    <button class="quiz-btn" onclick="responder(this, 2, false)">Jugo de naranja 🍊</button>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. ¿Qué comida es la preferida para pedir y mirar una peli juntos?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 3, false)">Sushi 🍣</button>
+                    <button class="quiz-btn" onclick="responder(this, 3, false)">Empanadas 🥟</button>
+                    <button class="quiz-btn" onclick="responder(this, 3, true)">Hamburguesas de Tasty o McD 🍔</button>
+                    <button class="quiz-btn" onclick="responder(this, 3, false)">Ensalada 🥗</button>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>4. ¿Quién es la persona más hermosa, tierna y dueña de mi corazón?</p>
+                <div class="options-grid">
+                    <button class="quiz-btn" onclick="responder(this, 4, false)">Una actriz famosa 🎬</button>
+                    <button class="quiz-btn" onclick="responder(this, 4, true)">Vos (mi gorda hermosa) 🥰</button>
+                    <button class="quiz-btn" onclick="responder(this, 4, false)">Nadie 😜</button>
+                    <button class="quiz-btn" onclick="responder(this, 4, false)">Messi 🐐</button>
+                </div>
+            </div>
+
+            <div id="quizResult"></div>
+        </div>
+
+        <!-- SECCIÓN MINI LIBRETA / PIZARRA DE DIBUJO -->
+        <div class="drawing-box">
+            <h2>Nuestra Mini Libreta 📝✏️</h2>
+            <p>¡Dejame un dibujito o un mensaje a mano! Se guarda automáticamente:</p>
+            
+            <div class="canvas-container">
+                <canvas id="paintCanvas"></canvas>
+            </div>
+
+            <div class="drawing-controls">
+                <input type="color" id="colorPicker" class="color-picker" value="#ff2a55">
+                <button class="drawing-btn active" id="pencilBtn" onclick="usarLapiz()">✏️ Lápiz</button>
+                <button class="drawing-btn" id="eraserBtn" onclick="usarGoma()">🧹 Borrador</button>
+                <button class="drawing-btn" onclick="limpiarCanvas()">🗑️ Limpiar Todo</button>
+            </div>
         </div>
 
         <!-- GALERÍA DE FOTOS -->
@@ -432,6 +637,160 @@
     </div>
 
     <script>
+        // LÓGICA DE DIBUJO Y LIBRETA (CANVAS + LOCALSTORAGE)
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        const pencilBtn = document.getElementById('pencilBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
+
+        let dibujando = false;
+        let modoBorrador = false;
+
+        function ajustarTamanoCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            // Guarda contenido actual para no perderlo al redimensionar
+            const tempImage = canvas.toDataURL();
+            
+            canvas.width = rect.width;
+            canvas.height = 300;
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = modoBorrador ? 20 : 4;
+            ctx.strokeStyle = modoBorrador ? '#ffffff' : colorPicker.value;
+
+            // Restaura contenido guardado
+            cargarDibujoGuardado(tempImage);
+        }
+
+        function obtenerPosicion(e) {
+            const rect = canvas.getBoundingClientRect();
+            let x, y;
+            if (e.touches && e.touches.length > 0) {
+                x = e.touches[0].clientX - rect.left;
+                y = e.touches[0].clientY - rect.top;
+            } else {
+                x = e.clientX - rect.left;
+                y = e.clientY - rect.top;
+            }
+            return { x, y };
+        }
+
+        function empezarDibujo(e) {
+            dibujando = true;
+            const pos = obtenerPosicion(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function dibujar(e) {
+            if (!dibujando) return;
+            e.preventDefault();
+            const pos = obtenerPosicion(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function detenerDibujo() {
+            if (dibujando) {
+                dibujando = false;
+                ctx.closePath();
+                guardarDibujo();
+            }
+        }
+
+        function usarLapiz() {
+            modoBorrador = false;
+            ctx.strokeStyle = colorPicker.value;
+            ctx.lineWidth = 4;
+            pencilBtn.classList.add('active');
+            eraserBtn.classList.remove('active');
+        }
+
+        function usarGoma() {
+            modoBorrador = true;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 20;
+            eraserBtn.classList.add('active');
+            pencilBtn.classList.remove('active');
+        }
+
+        function limpiarCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            localStorage.removeItem('dibujoNuestraHistoria');
+        }
+
+        function guardarDibujo() {
+            const dataURL = canvas.toDataURL();
+            localStorage.setItem('dibujoNuestraHistoria', dataURL);
+        }
+
+        function cargarDibujoGuardado(dataURLOpcional) {
+            const dataURL = dataURLOpcional || localStorage.getItem('dibujoNuestraHistoria');
+            if (dataURL) {
+                const img = new Image();
+                img.src = dataURL;
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0);
+                };
+            }
+        }
+
+        // Eventos Mouse y Touch
+        canvas.addEventListener('mousedown', empezarDibujo);
+        canvas.addEventListener('mousemove', dibujar);
+        canvas.addEventListener('mouseup', detenerDibujo);
+        canvas.addEventListener('mouseleave', detenerDibujo);
+
+        canvas.addEventListener('touchstart', empezarDibujo, { passive: false });
+        canvas.addEventListener('touchmove', dibujar, { passive: false });
+        canvas.addEventListener('touchend', detenerDibujo);
+
+        colorPicker.addEventListener('input', (e) => {
+            if (!modoBorrador) {
+                ctx.strokeStyle = e.target.value;
+            }
+        });
+
+        // Inicializar canvas al cargar
+        window.addEventListener('load', () => {
+            ajustarTamanoCanvas();
+            cargarDibujoGuardado();
+        });
+
+        // LÓGICA DE TRIVIA
+        let aciertos = 0;
+        let respondidas = [false, false, false, false];
+
+        function responder(boton, numPregunta, esCorrecta) {
+            if (respondidas[numPregunta - 1]) return;
+
+            const opciones = boton.parentElement.querySelectorAll('.quiz-btn');
+            
+            if (esCorrecta) {
+                boton.classList.add('correct');
+                aciertos++;
+            } else {
+                boton.classList.add('incorrect');
+            }
+
+            opciones.forEach(btn => btn.style.pointerEvents = 'none');
+            respondidas[numPregunta - 1] = true;
+
+            if (!respondidas.includes(false)) {
+                const resultado = document.getElementById('quizResult');
+                if (aciertos === 4) {
+                    resultado.innerText = "¡100% de respuestas correctas! ¡Sos la mejor! 🎉🥰❤️";
+                    if (typeof confetti === "function") {
+                        confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+                    }
+                } else {
+                    resultado.innerText = `Acertaste ${aciertos} de 4. ¡Te amo igual mi vida! ❤️`;
+                }
+            }
+        }
+
         // LÓGICA DE RULETA DE CITAS
         const ideasCitas = [
             "🍔 Hamburguesas en Tasty o McDonald's + peli",
@@ -465,11 +824,7 @@
                     girando = false;
                     
                     if (typeof confetti === "function") {
-                        confetti({
-                            particleCount: 50,
-                            spread: 60,
-                            origin: { y: 0.7 }
-                        });
+                        confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
                     }
                 }
             }, velocidad);
