@@ -27,6 +27,7 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            padding-bottom: 80px; /* Espacio para el botón de música flotante */
         }
 
         /* FONDO DE CORAZONES ANIMADOS */
@@ -126,7 +127,7 @@
             justify-content: center;
             gap: 25px;
             padding: 10px;
-            margin-bottom: 40px;
+            margin-bottom: 15px;
         }
 
         .card {
@@ -165,6 +166,15 @@
             font-weight: 600;
         }
 
+        .coming-soon {
+            margin-top: 10px;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+            color: #888;
+            font-style: italic;
+            font-weight: 500;
+        }
+
         /* ESTRUCTURA PARALELA PARA TRIVIA Y PLANES */
         .interactive-grid {
             display: grid;
@@ -175,7 +185,7 @@
 
         @media (max-width: 768px) {
             .interactive-grid {
-                grid-template-columns: 1fr; /* Se apila en pantallas muy pequeñas */
+                grid-template-columns: 1fr; /* Se apila en celulares */
             }
         }
 
@@ -295,14 +305,14 @@
             box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
         }
 
-        /* LIBRETA DE DIBUJO ABAJO DE LOS DOS */
+        /* LIBRETA DE DIBUJO CON BORRADOR Y TAMAÑO */
         .libreta-box {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
             padding: 20px;
             border-radius: 16px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -328,44 +338,72 @@
 
         .libreta-controls {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
+            justify-content: center;
             gap: 12px;
-            margin-top: 12px;
+            margin-top: 15px;
+            background: #fff0f3;
+            padding: 10px 15px;
+            border-radius: 12px;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #555;
         }
 
         .color-picker {
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             cursor: pointer;
             background: none;
+        }
+
+        .btn-tool {
+            background-color: #ffffff;
+            border: 2px solid #ffccd5;
+            color: #444;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-tool.active {
+            background-color: #ff758c;
+            color: white;
+            border-color: #ff758c;
         }
 
         .btn-clear {
             background-color: #ff4d6d;
             color: white;
             border: none;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 8px;
-            font-size: 0.9em;
+            font-size: 0.85em;
             font-weight: bold;
             cursor: pointer;
         }
 
-        .coming-soon {
-            margin-top: 20px;
-            margin-bottom: 40px;
-            font-size: 1.3em;
-            color: #888;
-            font-style: italic;
-            font-weight: 500;
+        .size-slider {
+            width: 80px;
+            accent-color: #ff4d6d;
         }
 
-        /* BOTÓN FLOTANTE DE MÚSICA */
+        /* BOTÓN FLOTANTE DE MÚSICA (ABOJO A LA DERECHA) */
         .music-btn {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             right: 20px;
             background: #ff4d6d;
             color: white;
@@ -450,7 +488,7 @@
     <!-- FONDO DE CORAZONES -->
     <div class="hearts-background" id="heartsBg"></div>
 
-    <!-- BOTÓN DE MÚSICA -->
+    <!-- BOTÓN DE MÚSICA (ABAJO A LA DERECHA) -->
     <button class="music-btn" id="musicBtn" onclick="toggleMúsica()">
         <span id="musicIcon">🎵</span> <span id="musicText">Música</span>
     </button>
@@ -524,6 +562,9 @@
             </div>
         </div>
 
+        <!-- MÁS RECUERDOS PRÓXIMAMENTE (ABAJO DE LAS FOTOS) -->
+        <p class="coming-soon">Más recuerdos próximamente... ✨</p>
+
         <!-- SECCIÓN INTERACTIVA PARALELA: TRIVIA Y PLANES -->
         <div class="interactive-grid">
             
@@ -547,17 +588,27 @@
 
         </div>
 
-        <!-- MINI LIBRETA DE DIBUJO (ABAJO DE AMBOS Y SOBRE MÁS RECUERDOS) -->
+        <!-- MINI LIBRETA DE DIBUJO CON BORRADOR Y TAMANO -->
         <div class="libreta-box">
             <h2>Nuestra Mini Libreta 📝</h2>
             <canvas id="paintCanvas"></canvas>
             <div class="libreta-controls">
-                <input type="color" id="colorPicker" class="color-picker" value="#ff2a55">
-                <button class="btn-clear" onclick="limpiarCanvas()">Limpiar pantalla</button>
+                <button id="btnPincel" class="btn-tool active" onclick="usarPincel()">✏️ Lápiz</button>
+                <button id="btnBorrador" class="btn-tool" onclick="usarBorrador()">🧹 Borrador</button>
+                
+                <div class="control-group">
+                    <label for="colorPicker">Color:</label>
+                    <input type="color" id="colorPicker" class="color-picker" value="#ff2a55">
+                </div>
+
+                <div class="control-group">
+                    <label for="brushSize">Grosor:</label>
+                    <input type="range" id="brushSize" class="size-slider" min="1" max="30" value="4">
+                </div>
+
+                <button class="btn-clear" onclick="limpiarCanvas()">Limpiar todo</button>
             </div>
         </div>
-
-        <p class="coming-soon">Más recuerdos próximamente... ✨</p>
 
     </div>
 
@@ -661,13 +712,17 @@
 
 
         /* ==========================================
-           2. LÓGICA DE DIBUJO (LIBRETA RESPONSIVA)
+           2. LÓGICA DE DIBUJO (CON BORRADOR Y TAMAÑO)
            ========================================== */
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
         const colorPicker = document.getElementById('colorPicker');
+        const brushSize = document.getElementById('brushSize');
+        const btnPincel = document.getElementById('btnPincel');
+        const btnBorrador = document.getElementById('btnBorrador');
 
         let dibujando = false;
+        let modoBorrador = false;
 
         function ajustarTamanoCanvas() {
             const rect = canvas.getBoundingClientRect();
@@ -678,10 +733,32 @@
 
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = colorPicker.value;
+            actualizarEstiloPincel();
 
             cargarDibujoGuardado(tempImage);
+        }
+
+        function actualizarEstiloPincel() {
+            ctx.lineWidth = brushSize.value;
+            if (modoBorrador) {
+                ctx.strokeStyle = '#ffffff'; // Color blanco para borrar
+            } else {
+                ctx.strokeStyle = colorPicker.value;
+            }
+        }
+
+        function usarPincel() {
+            modoBorrador = false;
+            btnPincel.classList.add('active');
+            btnBorrador.classList.remove('active');
+            actualizarEstiloPincel();
+        }
+
+        function usarBorrador() {
+            modoBorrador = true;
+            btnBorrador.classList.add('active');
+            btnPincel.classList.remove('active');
+            actualizarEstiloPincel();
         }
 
         function obtenerPosicion(e) {
@@ -699,6 +776,7 @@
 
         function empezarDibujo(e) {
             dibujando = true;
+            actualizarEstiloPincel();
             const pos = obtenerPosicion(e);
             ctx.beginPath();
             ctx.moveTo(pos.x, pos.y);
@@ -750,9 +828,11 @@
         canvas.addEventListener('touchmove', dibujar, { passive: false });
         canvas.addEventListener('touchend', detenerDibujo);
 
-        colorPicker.addEventListener('input', (e) => {
-            ctx.strokeStyle = e.target.value;
+        colorPicker.addEventListener('input', () => {
+            if (!modoBorrador) actualizarEstiloPincel();
         });
+
+        brushSize.addEventListener('input', actualizarEstiloPincel);
 
         window.addEventListener('load', () => {
             ajustarTamanoCanvas();
