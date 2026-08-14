@@ -3,27 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nuestra Página Especial</title>
+  <title>Nuestro Aniversario</title>
   <style>
-    /* Estilos Generales */
+    /* Reset y Estilos Generales */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f7ede2;
       color: #333;
-      margin: 0;
-      padding: 20px;
+      padding: 20px 20px 100px 20px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
 
     h1 {
       color: #84a59d;
-      margin-bottom: 20px;
+      margin-top: 10px;
+      margin-bottom: 25px;
+      text-align: center;
     }
 
-    /* Seccion de la Trivia */
+    /* ==========================================
+       SECCIÓN FOTOS / COLLAGE POLAROID
+       ========================================== */
+    .collage-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      max-width: 1000px;
+      margin-bottom: 40px;
+    }
+
+    .polaroid {
+      background-color: #ffffff;
+      padding: 12px 12px 25px 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 220px;
+    }
+
+    /* Leves rotaciones para dar efecto collage casual */
+    .polaroid:nth-child(1) { transform: rotate(-3deg); }
+    .polaroid:nth-child(2) { transform: rotate(2deg); }
+    .polaroid:nth-child(3) { transform: rotate(-1deg); }
+
+    .polaroid:hover {
+      transform: scale(1.05) rotate(0deg);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+      z-index: 10;
+    }
+
+    .polaroid img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 2px;
+    }
+
+    .polaroid .caption {
+      margin-top: 12px;
+      font-family: 'Comic Sans MS', 'Caveat', cursive, sans-serif;
+      font-size: 16px;
+      color: #555;
+    }
+
+    /* ==========================================
+       SECCIÓN TRIVIA
+       ========================================== */
     .trivia-container {
       background-color: #ffffff;
       padding: 25px;
@@ -32,7 +89,7 @@
       width: 100%;
       max-width: 450px;
       text-align: center;
-      margin-top: 20px;
+      margin-bottom: 40px;
     }
 
     .options-container {
@@ -82,7 +139,9 @@
       background-color: #62837b;
     }
 
-    /* Libreta posicionada abajo a la izquierda (Desplegada) */
+    /* ==========================================
+       SECCIÓN LIBRETA (Abajo a la izquierda)
+       ========================================== */
     #libreta-container {
       position: fixed;
       bottom: 20px;
@@ -128,7 +187,9 @@
       background-color: #d86967;
     }
 
-    /* Botón flotante "¿Qué hacemos hoy?" como ícono a la derecha */
+    /* ==========================================
+       SECCIÓN ¿QUÉ HACEMOS HOY? (Ícono flotante a la derecha)
+       ========================================== */
     #plan-icon-btn {
       position: fixed;
       bottom: 20px;
@@ -154,7 +215,6 @@
       background-color: #e56b69;
     }
 
-    /* Modal emergente para "¿Qué hacemos hoy?" */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -176,7 +236,7 @@
       width: 90%;
       text-align: center;
       position: relative;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
     .close-modal {
@@ -220,17 +280,35 @@
 </head>
 <body>
 
-  <h1>Trivia Interactiva</h1>
+  <h1>Nuestros Momentos Especiales ❤️</h1>
+
+  <!-- Galería de Fotos (Collage Polaroid) -->
+  <div class="collage-container">
+    <div class="polaroid">
+      <img src="foto1.jpg" alt="Foto 1">
+      <div class="caption">Nuestra primera foto 📸</div>
+    </div>
+    <div class="polaroid">
+      <img src="foto2.jpg" alt="Foto 2">
+      <div class="caption">Un día inolvidable ✨</div>
+    </div>
+    <div class="polaroid">
+      <img src="foto3.jpg" alt="Foto 3">
+      <div class="caption">Juntos siempre 💕</div>
+    </div>
+  </div>
 
   <!-- Contenedor de la Trivia -->
   <div class="trivia-container">
+    <h2>Trivia Interactiva 🧩</h2>
+    <br>
     <div id="question-text" style="font-weight: 600; font-size: 18px;">Cargando pregunta...</div>
     <div class="options-container" id="options-container"></div>
     <div class="feedback" id="feedback"></div>
     <button class="btn-retry" id="btn-retry" onclick="resetTrivia()">Volver a intentar</button>
   </div>
 
-  <!-- Libreta abajo a la izquierda (desplegada completa) -->
+  <!-- Libreta abajo a la izquierda (Desplegada completa) -->
   <div id="libreta-container">
     <div class="libreta-header">Mi Libreta 📝</div>
     <canvas id="canvas-libreta" width="220" height="260"></canvas>
@@ -240,7 +318,7 @@
   <!-- Botón de Ícono flotante a la derecha para "¿Qué hacemos hoy?" -->
   <button id="plan-icon-btn" onclick="openPlanModal()" title="¿Qué hacemos hoy?">💡</button>
 
-  <!-- Modal Emergente de "¿Qué hacemos hoy?" -->
+  <!-- Ventana Modal Emergente para "¿Qué hacemos hoy?" -->
   <div class="modal-overlay" id="plan-modal">
     <div class="modal-content">
       <span class="close-modal" onclick="closePlanModal()">&times;</span>
@@ -252,7 +330,7 @@
 
   <script>
     /* ==========================================
-       LÓGICA DE LA TRIVIA
+       1. LÓGICA DE LA TRIVIA
        ========================================== */
     const questions = [
       {
@@ -333,7 +411,7 @@
 
 
     /* ==========================================
-       LÓGICA DEL ÍCONO / MODAL "¿QUÉ HACEMOS HOY?"
+       2. LÓGICA DEL ÍCONO / MODAL "¿QUÉ HACEMOS HOY?"
        ========================================== */
     const plans = [
       "Tomar tereré en el parque 🧉",
@@ -362,7 +440,7 @@
 
 
     /* ==========================================
-       LÓGICA DE LA LIBRETA (CANVAS + LOCALSTORAGE)
+       3. LÓGICA DE LA LIBRETA (CANVAS + LOCALSTORAGE)
        ========================================== */
     const canvas = document.getElementById('canvas-libreta');
     const ctx = canvas.getContext('2d');
@@ -372,6 +450,7 @@
     ctx.lineCap = 'round';
     ctx.strokeStyle = '#333333';
 
+    // Cargar dibujo guardado en localStorage
     const savedDrawing = localStorage.getItem('libreta_dibujo');
     if (savedDrawing) {
       const img = new Image();
