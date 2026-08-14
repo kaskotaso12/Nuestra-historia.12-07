@@ -31,7 +31,7 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            padding-bottom: 80px; /* Espacio para el botón de música flotante */
+            padding-bottom: 120px; /* Espacio para el reproductor flotante */
         }
 
         /* FONDO DE CORAZONES ANIMADOS */
@@ -425,7 +425,7 @@
             accent-color: #ff4d6d;
         }
 
-        /* REPRODUCTOR DE MÚSICA FLOTANTE CON MENÚ */
+        /* REPRODUCTOR DE MÚSICA SPOTIFY FLOTANTE */
         .music-wrapper {
             position: fixed;
             bottom: 20px;
@@ -486,7 +486,7 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             margin-bottom: 8px;
-            width: 220px;
+            width: 280px;
             overflow: hidden;
             border: 1px solid #ffccd5;
             text-align: left;
@@ -593,27 +593,35 @@
     <!-- FONDO DE CORAZONES -->
     <div class="hearts-background" id="heartsBg"></div>
 
-    <!-- REPRODUCTOR DE MÚSICA CON MENÚ DE TRES RAYITAS -->
+    <!-- REPRODUCTOR DE MÚSICA CON SPOTIFY EMBEDDED -->
     <div class="music-wrapper">
         <div class="music-dropdown" id="musicDropdown">
             <div class="music-dropdown-header">Elegí una canción 🎵</div>
-            <div class="music-item active" onclick="cambiarCancion(0)">🎹 Piano Romántico</div>
-            <div class="music-item" onclick="cambiarCancion(1)">🎸 Babasónicos – Puesto</div>
-            <div class="music-item" onclick="cambiarCancion(2)">🎸 Airbag – Nunca Lo Olvides</div>
+            <div class="music-item" onclick="cambiarTrackSpotify(0)">🎸 Babasónicos – Puesto</div>
+            <div class="music-item" onclick="cambiarTrackSpotify(1)">🎸 Airbag – Cae el Sol</div>
+        </div>
+
+        <!-- Contenedor del IFrame de Spotify -->
+        <div id="spotifyContainer" style="margin-bottom: 8px;">
+            <iframe id="spotifyPlayer" 
+                    style="border-radius:12px; display:none;" 
+                    src="" 
+                    width="280" 
+                    height="80" 
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+            </iframe>
         </div>
 
         <div class="music-btn-container">
-            <button class="music-btn" id="musicBtn" onclick="toggleMúsica()">
-                <span id="musicIcon">🎵</span> <span id="musicText">Música</span>
+            <button class="music-btn" id="musicBtn" onclick="toggleMenuMusica(event)">
+                <span id="musicIcon">🎵</span> <span id="musicText">Canciones</span>
             </button>
             <button class="music-menu-btn" onclick="toggleMenuMusica(event)" title="Elegir canción">☰</button>
         </div>
     </div>
-
-    <!-- REPRODUCTOR AUDIO CON ENLACES STREAMING MP3 FUNCIONALES -->
-    <audio id="bgMusic" loop preload="auto">
-        <source id="musicSource" src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
-    </audio>
 
     <header>
         <h1>Nuestra Historia ❤️</h1>
@@ -1034,52 +1042,26 @@
 
 
         /* ==========================================
-           4. MÚSICA CON ENLACES STREAMING MP3 DIRECTOS
+           4. MÚSICA CON EMBEDS OFICIALES DE SPOTIFY
            ========================================== */
-        const playlist = [
-            { title: "Piano Romántico", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" },
-            { title: "Babasónicos – Puesto", src: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a82d02.mp3" },
-            { title: "Airbag – Nunca Lo Olvides", src: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939108b50.mp3" }
+        const spotifyPlaylist = [
+            { title: "Babasónicos – Puesto", embedUrl: "https://open.spotify.com/embed/track/5zpZUFF7YyPG90nkR88RYd" },
+            { title: "Airbag – Cae el Sol", embedUrl: "https://open.spotify.com/embed/track/1qAMb1y3o7Olwm8pYTuzyV" }
         ];
 
-        let currentTrack = 0;
-        const music = document.getElementById('bgMusic');
-        const musicSource = document.getElementById('musicSource');
-        const musicIcon = document.getElementById('musicIcon');
-        const musicText = document.getElementById('musicText');
+        const spotifyPlayer = document.getElementById('spotifyPlayer');
         const musicDropdown = document.getElementById('musicDropdown');
-
-        function toggleMúsica() {
-            if (music.paused) {
-                music.play().then(() => {
-                    musicIcon.innerText = '⏸️';
-                    musicText.innerText = 'Pausar';
-                }).catch(e => {
-                    alert("Toca la pantalla e intenta activar la música de nuevo.");
-                });
-            } else {
-                music.pause();
-                musicIcon.innerText = '🎵';
-                musicText.innerText = 'Música';
-            }
-        }
 
         function toggleMenuMusica(event) {
             event.stopPropagation();
             musicDropdown.classList.toggle('show');
         }
 
-        function cambiarCancion(index) {
-            currentTrack = index;
-            const track = playlist[index];
-
-            music.pause();
-            musicSource.src = track.src;
-            music.load();
-            music.play().then(() => {
-                musicIcon.innerText = '⏸️';
-                musicText.innerText = 'Pausar';
-            }).catch(e => console.log(e));
+        function cambiarTrackSpotify(index) {
+            const track = spotifyPlaylist[index];
+            
+            spotifyPlayer.src = track.embedUrl + "?utm_source=generator&theme=0";
+            spotifyPlayer.style.display = "block";
 
             const items = document.querySelectorAll('.music-item');
             items.forEach((item, idx) => {
